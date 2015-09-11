@@ -23,30 +23,11 @@ float admittance_controller(    float K,
                                 float angle,
                                 float torque )
 {
-
-/*
-    if (angle<1.05f*reference_angle && angle>0.95f*reference_angle)
-        return 0.0f;
-
-    else if (angle<reference_angle)
-        return 100.0f;
-    else if (angle>reference_angle)
-        return -100.0f;
-    else 
-        return 0.0f;
-*/
-
     float w;
 
     //complete law
     w=(1.0f/360.0f)*(  (K/D)*(reference_angle-angle) -torque/D  );
 
-    //ignoring torque
-    //w=(1.0f/360.0f)*(  (K/D)*(reference_angle-angle) );//-torque/D  );
- 
-
-    //ZERO stiffness
-    //w=(1.0f/360.0f)*(  (0.0f)*(reference_angle-angle) -torque/D  );
     if (w> MAX_SPEED) w=MAX_SPEED;
     if (w<-MAX_SPEED) w=-MAX_SPEED;
     return  w;

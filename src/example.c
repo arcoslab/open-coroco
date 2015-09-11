@@ -75,9 +75,7 @@
 #include "F4/interrupts.c"
 
 #include "Print/collecting_data.c"
-
-#include "Parameter_Identification/parameter_identification.h"
-#include "Parameter_Identification/parameter_identification.c"
+    
 
 int main(void)
 {

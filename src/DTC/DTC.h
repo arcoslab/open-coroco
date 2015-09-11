@@ -81,26 +81,6 @@ void voltage_switch_inverter_VSI(int S_A, int S_B, int S_C);
 void DTC(void);//(float i_A,float i_B, float U_d,float L_sq,float psi_F,float t_e_ref);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 float duty_cycle_to_angle(float duty_cycle);
 float phase_A_angle_to_stator_angle(float phase_A_angle);
 float stator_angle_to_phase_A(float stator_angle);
