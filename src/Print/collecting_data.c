@@ -805,14 +805,14 @@ void print_regular_data(void)
         //printf ("r")  ;  checksum=checksum  +print_float_as_bytes(data_ref_freq_SVM            );
         printf ("e")  ;  checksum=checksum  +print_float_as_bytes(data_w_r                     );
     }
-
+    /*
     else if (print_selection==8)
     {
         printf ("t")  ;  checksum=           print_float_as_bytes(data_timer                   );
         printf ("K")  ;  checksum=          +print_float_as_bytes(fake_P_SENSORLESS                  );
         printf ("I")  ;  checksum=checksum  +print_float_as_bytes(I_SENSORLESS                  );
     }
-
+    */
 
 
     else if (print_selection==12)

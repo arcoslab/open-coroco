@@ -38,24 +38,9 @@
 #define PI_MIN_SENSORLESS_SVM          -90.0f// -0.0005f//-(90.0f*frequency/interrupt_frequency) 
 
 
-/*
-//fast
-//extra_voltage_angle=extra_voltage_angle+extra_load_angle;
-//[Original dirty speed controller]
-float P_SENSORLESS_SVM      = 0.001f; 
-float P_DOWN_SENSORLESS_SVM = 0.001f; 
-//float fake_P_SENSORLESS_SVM = 0.000002f;
-float I_SENSORLESS_SVM      = 0.0f;
-float I_DOWN_SENSORLESS_SVM = 0.0f;
-float fake_I_SENSORLESS_SVM = 0.0f;
-*/
-
 
 /************************************************************/
 ////Activate when using the function: "SVM_speed_close_loop_of_voltage_frequency_old"////
-//fast
-//extra_voltage_angle=extra_voltage_angle+extra_load_angle;
-//[Original dirty speed controller]
 float P_SENSORLESS_SVM      = 0.00001f; 
 float P_DOWN_SENSORLESS_SVM = 0.00001f; 
 float fake_P_SENSORLESS_SVM = 0.000002f;
@@ -63,26 +48,6 @@ float I_SENSORLESS_SVM      = 0.0f;
 float I_DOWN_SENSORLESS_SVM = 0.0f;
 float fake_I_SENSORLESS_SVM = 0.0f;
 /****************************************************************/
-
-
-
-//DTC-SVM speed controller
-#define I_MAX_SENSORLESS            60.0f//  0.0005f//(90.0f*frequency/interrupt_frequency) 
-#define P_MAX_SENSORLESS            60.0f//  0.0005f//(90.0f*frequency/interrupt_frequency) 
-#define PI_MAX_SENSORLESS           60.0f//  0.0005f//(90.0f*frequency/interrupt_frequency) 
-#define PI_MIN_SENSORLESS          -60.0f// -0.0005f//-(90.0f*frequency/interrupt_frequency) 
-
-float P_SENSORLESS      = 0.8f; 
-float P_DOWN_SENSORLESS = 0.8f; 
-float fake_P_SENSORLESS = 0.8f;
-float I_SENSORLESS      = 0.0f;
-float I_DOWN_SENSORLESS = 0.0f;
-float fake_I_SENSORLESS = 0.0f;
-
-
-
-
-
 
 
 

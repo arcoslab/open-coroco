@@ -378,8 +378,8 @@ int   initial_rotor_zone=0;
 
 
 
-/*
-float SVM_speed_close_loop_of_voltage_frequency(float reference_frequency, float frequency,bool close_loop_active, float* VsD, float* VsQ,float Ud,bool shutdown)
+
+float SVM_speed_close_loop_of_voltage_frequency_old(float reference_frequency, float frequency,bool close_loop_active, float* VsD, float* VsQ,float Ud,bool shutdown)
 {
 
     static float extra_voltage_angle=0.0f;
@@ -414,7 +414,6 @@ float SVM_speed_close_loop_of_voltage_frequency(float reference_frequency, float
         extra_load_angle=extra_load_angle+extra_load_angle_increase;
         //extra_load_angle=frequency*360.0f*(2.0f*TICK_PERIOD)+extra_load_angle_increase;
         extra_voltage_angle=extra_voltage_angle+extra_load_angle;
-
         if (extra_voltage_angle>=360.0f) {extra_voltage_angle=extra_voltage_angle-360.0f;}
         if (extra_voltage_angle<0.0f)    {extra_voltage_angle=extra_voltage_angle+360.0f;}
 
@@ -424,54 +423,50 @@ float SVM_speed_close_loop_of_voltage_frequency(float reference_frequency, float
 
    return extra_load_angle;
 }
-*/
 
 float SVM_speed_close_loop_of_voltage_frequency(float reference_frequency, float frequency,bool close_loop_active, float* VsD, float* VsQ,float Ud,bool shutdown)
 {
 
-    static float cita=0.0f;
-    static float constant_speed_angle=0.0f;
-    static float acceleration_angle=0.0f;
-
+    static float extra_voltage_angle=0.0f;
+    static float extra_load_angle=0.0f;
+    static float extra_load_angle_increase=0.0f;
+    //float Value;
 
     if (shutdown==true)
     {
         *VsD=0.0f;
         *VsQ=0.0f;
 
-        //cita=0.0f;
-        constant_speed_angle=0.0f;
-        acceleration_angle  =0.0f;
+        //extra_voltage_angle=0.0f;
+        extra_load_angle=0.0f;
+        extra_load_angle_increase=0.0f;
         
     }
 
-    else if (close_loop_active==false) 
-    { 
-        *VsD=*VsD;
-        *VsQ=*VsQ;
-        //cita=0.0f;
-        constant_speed_angle=0.0f;
-        acceleration_angle  =0.0f;
-    } 
-
     else if (close_loop_active==true )
     {  
-        sensorless_pure_speed_SVM_pi_controller(reference_frequency,frequency,&acceleration_angle); 
+        sensorless_pure_speed_SVM_pi_controller(reference_frequency,frequency,&extra_load_angle_increase); 
+        
+        extra_load_angle_increase=90.0f;
 
-        constant_speed_angle=0.01f;//constant_speed_angle+acceleration_angle;
-       
-        cita=cita+constant_speed_angle;
 
-        if (cita>=360.0f) {cita=cita-360.0f;}
-        if (cita<0.0f)    {cita=cita+360.0f;}
+        extra_voltage_angle=extra_voltage_angle+frequency*360.0f*(2.0f*TICK_PERIOD)+extra_load_angle_increase;
 
-       *VsD = 20.0f*Ud*fast_cos(cita);
-       *VsQ = 20.0f*Ud*fast_sine(cita);
+        if (extra_voltage_angle>=360.0f) {extra_voltage_angle=extra_voltage_angle-360.0f;}
+        if (extra_voltage_angle<0.0f)    {extra_voltage_angle=extra_voltage_angle+360.0f;}
+
+
+       //*VsD = SVM_V_s_ref_D (psi_s_ref,psi_s,psi_s_alpha_SVM,extra_voltage_angle,i_sD,R_s,2.0f*TICK_PERIOD);
+       //*VsQ = SVM_V_s_ref_Q (psi_s_ref,psi_s,psi_s_alpha_SVM,extra_voltage_angle,i_sQ,R_s,2.0f*TICK_PERIOD);
+
+
+        *VsD = 20.0f*Ud*fast_cos(extra_voltage_angle);
+        *VsQ = 20.0f*Ud*fast_sine(extra_voltage_angle);
+        pi_max=frequency*360.0f*(2.0f*TICK_PERIOD)+extra_load_angle_increase;//Value;//extra_voltage_angle;
    } 
 
-   return constant_speed_angle;
+   return extra_load_angle;
 }
-
 
 
 
@@ -568,7 +563,7 @@ else
 
   SVM_phase_duty_cycles           (&duty_a, &duty_b, &duty_c, cita_V_s,T_max_on,T_med_on,T_min_on);
   
-  duty_a=0.5f;
+  duty_a=0.8f;
   duty_b=0.0f;
   duty_c=0.0f;
 

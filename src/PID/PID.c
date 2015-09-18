@@ -503,19 +503,21 @@ void frequency_input(void)
       if (strcmp(cmd, "t") == 0)
       {
         timer=0;
-      }	 
+      }	
+      /* 
       if (strcmp(cmd, "P") == 0)
       {
         fake_P_SENSORLESS =value;
         P_SENSORLESS      = value/10000000.0f;
         P_DOWN_SENSORLESS = value/10000000.0f;
         print_selection   = 8;
-      }	 
+      }	
+      */ 
 
      
 
 
-
+      /*
       if (strcmp(cmd, "I") == 0)
       {
         fake_I_SENSORLESS =value;
@@ -523,7 +525,7 @@ void frequency_input(void)
         I_DOWN_SENSORLESS = value/10000000000000000000.0f;
         print_selection   = 8;
       }
-
+      */
 
 
 
