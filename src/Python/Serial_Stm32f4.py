@@ -353,7 +353,7 @@ class Serial_Stm32f4(object):
         elif self.print_selection== 5: header_csv ="t t psisD psisD psisQ psisQ "
         elif self.print_selection== 6: header_csv ="t t te te Ud Ud pi_control pi_control pi_max pi_max" 
         elif self.print_selection== 7: header_csv ="t t pi_control pi_control pi_max pi_max" 
-        elif self.print_selection==11: header_csv ="t t psis psis alpha alpha ref ref"
+        elif self.print_selection==11: header_csvx ="t t psis psis alpha alpha ref ref"
         else :                         header_csv =""
 
         split_header = header_csv.split()                  

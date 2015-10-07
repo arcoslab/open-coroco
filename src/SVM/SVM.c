@@ -214,10 +214,16 @@ void SVM_phase_duty_cycles(float *duty_A, float *duty_B, float *duty_C,float V_s
 
 
 
-void  SVM_voltage_switch_inverter_VSI(float duty_A,float duty_B,float duty_C,bool shutdown)
+void  SVM_voltage_switch_inverter_VSI_dead_time_counter(float duty_A,float duty_B,float duty_C,bool shutdown)
 {
   //DTC-SVM switching selection
   float Attenuation;
+
+
+  //********delete*********//
+  static int dead_counter=0;
+  //int dead_counter_max=2;
+  //***********************//
 
   if (shutdown==false)
   {
@@ -225,8 +231,102 @@ void  SVM_voltage_switch_inverter_VSI(float duty_A,float duty_B,float duty_C,boo
 
     //-------------SA: S1 and S4------------------------------------
     timer_set_oc_mode      (TIM1, TIM_OC1, TIM_OCM_PWM1);
+    
+    if (dead_counter>=1)
+    {
+    timer_disable_oc_output (TIM1, TIM_OC1 );  //S1
+    timer_enable_oc_output (TIM1, TIM_OC1N);  //S4}
+    dead_counter=0;
+
+    timer_set_oc_mode      (TIM1, TIM_OC2, TIM_OCM_PWM1);
+    timer_disable_oc_output (TIM1, TIM_OC2 );  //S1
+    timer_enable_oc_output (TIM1, TIM_OC2N);  //S4}
+
+    timer_set_oc_mode      (TIM1, TIM_OC3, TIM_OCM_PWM1);
+    timer_disable_oc_output (TIM1, TIM_OC3 );  //S1
+    timer_enable_oc_output (TIM1, TIM_OC3N);  //S4}
+    }
+    else
+    {
+    timer_enable_oc_output (TIM1, TIM_OC1 );  //S1
+    timer_disable_oc_output (TIM1, TIM_OC1N);  //S4}
+    dead_counter=1;
+
+    timer_set_oc_mode      (TIM1, TIM_OC2, TIM_OCM_PWM1);
+    timer_enable_oc_output (TIM1, TIM_OC2 );  //S1
+    timer_disable_oc_output (TIM1, TIM_OC2N);  //S4}
+    timer_set_oc_mode      (TIM1, TIM_OC3, TIM_OCM_PWM1);
+    timer_enable_oc_output (TIM1, TIM_OC3 );  //S1
+    timer_disable_oc_output (TIM1, TIM_OC3N);  //S4}
+
+    }
+
+
+    //-------------SB: S3 and S6------------------------------------
+    //timer_set_oc_mode      (TIM1, TIM_OC2, TIM_OCM_PWM1);
+    //timer_enable_oc_output (TIM1, TIM_OC2 );  //S3
+    //timer_enable_oc_output (TIM1, TIM_OC2N);  //S6
+
+
+    //-------------SC: S5 and S2-------------------------------------
+    //timer_set_oc_mode(TIM1, TIM_OC3, TIM_OCM_PWM1);
+    //timer_enable_oc_output (TIM1, TIM_OC3 );  //S5 on
+    //timer_enable_oc_output (TIM1, TIM_OC3N);  //S2 off
+  }  
+
+  else
+  {
+    Attenuation=0.0f;
+    duty_A=0.0f;
+    duty_B=0.0f;
+    duty_C=0.0f;
+
+    //-------------SA: S1 and S4------------------------------------
+    timer_set_oc_mode      (TIM1, TIM_OC1, TIM_OCM_PWM1);
+    timer_disable_oc_output (TIM1, TIM_OC1 );  //S1
+    timer_disable_oc_output (TIM1, TIM_OC1N);  //S4}
+
+    //-------------SB: S3 and S6------------------------------------
+    timer_set_oc_mode      (TIM1, TIM_OC2, TIM_OCM_PWM1);
+    timer_disable_oc_output (TIM1, TIM_OC2 );  //S3
+    timer_disable_oc_output (TIM1, TIM_OC2N);  //S6
+
+
+    //-------------SC: S5 and S2-------------------------------------
+    timer_set_oc_mode(TIM1, TIM_OC3, TIM_OCM_PWM1);
+    timer_disable_oc_output (TIM1, TIM_OC3 );  //S5 on
+    timer_disable_oc_output (TIM1, TIM_OC3N);  //S2 off
+  }  
+
+  //Set the capture compare value for OC1.
+  timer_set_oc_value(TIM1, TIM_OC1, duty_A*Attenuation*PWM_PERIOD_ARR);
+  //Set the capture compare value for OC1.
+  timer_set_oc_value(TIM1, TIM_OC2, duty_B*Attenuation*PWM_PERIOD_ARR);
+  //Set the capture compare value for OC1.
+  timer_set_oc_value(TIM1, TIM_OC3, duty_C*Attenuation*PWM_PERIOD_ARR);
+}
+
+void  SVM_voltage_switch_inverter_VSI(float duty_A,float duty_B,float duty_C,bool shutdown)
+{
+  //DTC-SVM switching selection
+  float Attenuation;
+
+
+  //********delete*********//
+  static int dead_counter=0;
+  //int dead_counter_max=2;
+  //***********************//
+
+  if (shutdown==false)
+  {
+    Attenuation=1.0f;
+
+    //-------------SA: S1 and S4------------------------------------
+    timer_set_oc_mode      (TIM1, TIM_OC1, TIM_OCM_PWM1);   
     timer_enable_oc_output (TIM1, TIM_OC1 );  //S1
     timer_enable_oc_output (TIM1, TIM_OC1N);  //S4}
+
+
 
     //-------------SB: S3 and S6------------------------------------
     timer_set_oc_mode      (TIM1, TIM_OC2, TIM_OCM_PWM1);
@@ -271,7 +371,6 @@ void  SVM_voltage_switch_inverter_VSI(float duty_A,float duty_B,float duty_C,boo
   //Set the capture compare value for OC1.
   timer_set_oc_value(TIM1, TIM_OC3, duty_C*Attenuation*PWM_PERIOD_ARR);
 }
-
 
 int S_A=0;
 int S_B=0;
@@ -458,7 +557,8 @@ float SVM_speed_close_loop_of_voltage_frequency(float reference_frequency, float
     {  
         sensorless_pure_speed_SVM_pi_controller(reference_frequency,frequency,&acceleration_angle); 
 
-        constant_speed_angle=0.01f;//constant_speed_angle+acceleration_angle;
+        if (frequency < 100.0f)
+        constant_speed_angle=constant_speed_angle+0.0001f;//constant_speed_angle+acceleration_angle;
        
         cita=cita+constant_speed_angle;
 
@@ -514,9 +614,7 @@ else
   */
 
 
-  electric_angle= electric_angle+
-                            /*DTC-SVM PID controller*/                            
-
+  electric_angle= electric_angle+ 
                             /*SVM with PID controller on the frequency calculated with the hall sensor*/
                             SVM_speed_close_loop_of_voltage_frequency   (ref_freq_SVM,hall_freq,true,&V_sD,&V_sQ,U_d,shutdown); 
   
@@ -568,9 +666,9 @@ else
 
   SVM_phase_duty_cycles           (&duty_a, &duty_b, &duty_c, cita_V_s,T_max_on,T_med_on,T_min_on);
   
-  duty_a=0.5f;
-  duty_b=0.0f;
-  duty_c=0.0f;
+  //duty_a=0.5f;
+  //duty_b=0.5f;
+  //duty_c=0.5f;
 
   
 

@@ -94,7 +94,7 @@ void DTC_SVM_tim_init(void)
 
 	/* Configure break and deadtime. */
 	//timer_set_deadtime(TIM1, deadtime_percentage*pwm_period_ARR);
-    timer_set_deadtime(TIM1, ((int)(DEAD_TIME_PERCENTAGE*PWM_PERIOD_ARR)));
+    timer_set_deadtime(TIM1, DEAD_TIME);//((int)(DEAD_TIME_PERCENTAGE*PWM_PERIOD_ARR)));
     //timer_set_deadtime(TIM1, 0.25f*PWM_PERIOD_ARR);
     //timer_set_deadtime(TIM1, 500);
     //timer_set_deadtime(TIM1, DEAD_TIME_PERCENTAGE*PWM_PERIOD_ARR);
