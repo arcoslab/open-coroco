@@ -133,7 +133,6 @@ else
   gpio_set(GPIOD, GPIO9);
   DTC_SVM();
   collecting_floating_data();
-  colllecting_flux_linkage();
   gpio_clear(GPIOD, GPIO11);
 }
 

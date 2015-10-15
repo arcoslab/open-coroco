@@ -91,8 +91,7 @@ int main(void)
 
     if (transmitting_to_python==true)
     {
-        if (print_selection==9) { full_print_regular_data();  }
-        else                  {      print_regular_data();  }
+        print_regular_data();
         transmitting_to_python=false;
         collecting_sensorless_data=true; 
     }

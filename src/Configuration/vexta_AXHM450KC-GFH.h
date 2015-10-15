@@ -43,10 +43,8 @@
 ////Activate when using the function: "SVM_speed_close_loop_of_voltage_frequency_old"////
 float P_SENSORLESS_SVM      = 0.00001f; 
 float P_DOWN_SENSORLESS_SVM = 0.00001f; 
-float fake_P_SENSORLESS_SVM = 0.000002f;
 float I_SENSORLESS_SVM      = 0.0f;
 float I_DOWN_SENSORLESS_SVM = 0.0f;
-float fake_I_SENSORLESS_SVM = 0.0f;
 /****************************************************************/
 
 
