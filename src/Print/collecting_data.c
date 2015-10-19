@@ -158,6 +158,7 @@ void print_regular_data(void)
         checksum=checksum  +print_float_as_bytes(data_ref_freq_SVM);
         checksum=checksum  +print_float_as_bytes(data_CUR_FREQ    );
     }
+
     //printf ("k");
     printf ("%c", checksum);
     printf ("m");

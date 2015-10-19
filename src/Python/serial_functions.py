@@ -2,6 +2,8 @@
 
 import serial
 from serial import SerialException
+import sys
+import select
 from byte_to_float import *
 
 
@@ -15,8 +17,10 @@ class Serial_Stm32(object):
     #control variables
     counter = 0
     connecting=True
-    
-
+    collect=False
+    plot=False
+    test=False
+    transmission_error=False
     def __init__(self):
         print "initializing Serial_Stm32 class"    
         #self.initializing_values()        
@@ -29,55 +33,52 @@ class Serial_Stm32(object):
         print "---Serial port closed: disconnected from the STM32F4---"
 
     def connecting_to_stm32F4(self):
+
+        self.print_selection=0
+
         while self.connecting==True:
             try:
                 self.ser = serial.Serial(self.dev_type+str(self.counter),self.serial_speed , timeout=self.serial_timeout)
                 self.connecting=False
                 self.ser.flushInput()
-                print "Connected to the STM32F4"              
+                print "Connected to the STM32F4"    
+
+
+                #it is required to send the print selection to the stm32 before it starts sending data
+                self.ser.write('p')
+                self.ser.write(' ')
+                self.ser.write(str(self.print_selection))
+                self.ser.write('\n')
+                self.ser.write('\r')          
                 
             except SerialException:
                 print"Disconnected from the STM32, cua cua"
                 self.counter=self.counter+1
-                if (self.counter>MAX_serial_device_counter):
+                if (self.counter>self.MAX_serial_device_counter):
                     self.counter=0
                 self.connecting=True 	
 
 
-
-
-
-    def read_data_from_stm32(self):
+    def read_data_from_stm32(self,data):
         bytes = 1
         single_character   = self.ser.read(bytes)
         
         self.checksum_python=0
-        self.checksum_stm32=0
+        checksum_stm32=0
 
         if(single_character == "X" and single_character!=None):
 
-            #while (single_character != "m"):
-                
-            '''
-            single_character = self.ser.read(bytes)
-            if   (single_character=='t'):   self.time                =self.get_data_and_checksum()
-            elif (single_character=='r'):   self.reference_frequency =self.get_data_and_checksum()
-            elif (single_character=='h'):   self.hall_frequency      =self.get_data_and_checksum()
-            elif (single_character=='k'):   self.checksum_stm32 = ord(self.ser.read(bytes))
-            '''
-            self.time                =self.get_data_and_checksum()
-            self.reference_frequency =self.get_data_and_checksum()
-            self.hall_frequency      =self.get_data_and_checksum()
-            self.checksum_stm32 = ord(self.ser.read(bytes))
+            for i in range(len(data)):
+                data[i]=self.get_data_and_checksum()
 
-        #print "checksum python: ",self.checksum_pthon ,"checksum_stm32",self.checksum_stm32
+            checksum_stm32 = ord(self.ser.read(bytes))
 
+        if (self.checksum_python!=checksum_stm32) or (checksum_stm32==0):
+            self.transmission_error=True 
 
-        if (self.checksum_python!=self.checksum_stm32):
-            self.transmition_error=True 
+        #elif ( (checksum_stm32!=0) and (self.checksum_python==checksum_stm32) ):
+        #    self.transmission_error=False
 
-        elif ( (self.checksum_stm32!=0) and (self.checksum_python==self.checksum_stm32) ):
-            print "time: ",self.time, "ref freq: ",self.reference_frequency,"hall_frequency: ",self.hall_frequency
 
 
     def get_data_and_checksum(self):
@@ -95,10 +96,10 @@ class Serial_Stm32(object):
                     #print "after conversion"
                     if (convertion[0]==True):                      
                         data = convertion[1]
-                        self.transmition_error=False
+                        self.transmission_error=False
                         #print "found, whaat!"+str(data)
                     else:   
-                        self.transmition_error=True
+                        self.transmission_error=True
                         data=0
                         #print " four bytes not found" 
                     
@@ -109,4 +110,88 @@ class Serial_Stm32(object):
                             if self.checksum_python>=256:
                                 self.checksum_python=self.checksum_python-256
                         #print ord(ch)
-                    return data           
+                    return data  
+
+    def write_a_line(self,line):
+        self.ser.write(line)
+        self.ser.write('\n')
+        self.ser.write('\r') 
+
+    def write_commands_to_stm32(self):
+        
+        #print "beginning of function"
+        line=''
+        while sys.stdin in select.select([sys.stdin], [], [], 0)[0]:	#read from standart input if there is something, otherwise not 
+            line = sys.stdin.readline()                                 #you must press enter before typing the new command
+            #print "inside first while"
+ 
+        #print "after while" 
+        if line:
+            #print "before raw input"
+            line=raw_input("Enter new command: ")   #the printing of the stm32f4 data is stopped until you type a new reference
+            #print "after raw input"
+            if line:
+
+                split_command = line.split()
+
+                if   split_command[0]=='p': 
+                    self.write_a_line(line)
+                    self.print_selection=split_command[1]
+                    
+                elif split_command[0]=='c': 
+                    self.collect=True
+                    
+                elif split_command[0]=='e': 
+                    self.collect=False
+                    self.plot   =True 
+                
+                elif split_command[0]=='t': 
+                    self.test=True
+
+                    self.ser.write('p')
+                    self.ser.write(' ')
+                    self.ser.write(str(self.print_selection))
+                    self.ser.write('\n')
+                    self.ser.write('\r')       
+
+                else: self.write_a_line(line)
+
+                
+
+            
+                '''
+                #updating reference frequency
+                if     split_command[0]=='d':   self.write_a_line(line)
+                elif   split_command[0]=='D':   self.write_a_line(line)
+                elif   split_command[0]=='K':   self.write_a_line(line)
+                elif   split_command[0]=='G':   self.write_a_line(line)
+                #capturing data into csv
+                elif   split_command[0]=='c':
+                    self.tag_comment       =line+self.aditional_comment+self.print_selection_tags()#raw_input("Enter comment: ") 
+                    self.path              =self.root_path + "["+datetime.datetime.now().ctime() +"] ["+self.tag_comment+"]"+'/'  
+
+                elif   split_command[0]=='C':   self.capture_c_button = True
+                elif split_command[0]=='f': self.end_capturing_data()
+
+                #selecting what to print
+                elif split_command[0]=='p': self.print_selection_setup(int(split_command[1]))
+
+
+
+                elif split_command[0]=='one':
+                    self.test_command='d'#'G';
+                    self.start_test=True;
+                    self.print_selection_setup(int(split_command[2]))
+                    self.test_frequency    =split_command[1]
+                    self.tag_comment       =line+self.aditional_comment#raw_input("Enter comment: ") 
+                    self.path              =self.root_path + "["+datetime.datetime.now().ctime() +"] ["+self.tag_comment+"]"+'/'  
+
+
+                elif split_command[0]=='ONE':
+                    
+                    self.start_test=True;
+                    self.print_selection_setup(int(split_command[2]))
+                    self.test_frequency    =split_command[1]
+                    self.tag_comment       =line+self.aditional_comment#raw_input("Enter comment: ") 
+                    #self.path              =self.root_path + "["+datetime.datetime.now().ctime() +"] ["+self.tag_comment+"]"+'/'  
+                '''
