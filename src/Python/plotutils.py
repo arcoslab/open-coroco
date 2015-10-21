@@ -7,7 +7,34 @@ import os
 state='start'
 state_timer='start'
 start_time=time.time()
+tag_x='a'
+tag_y='b'
+title=''
 
+def plot_selection(print_selection,data,data_buffer):
+
+    global tag_x
+    global tag_y
+    global title
+
+    
+
+    if (print_selection==0):
+        data.append()
+        
+        x=[]
+        y=[]
+        data_buffer=[]
+        data_buffer.append(x)
+        data_buffer.append(y)
+        tag_x="Cycles"
+        tag_y="Frequency (Hz)"
+        title="Electric Frequency measurde by Hall sensor"
+    print "print_selection: ",int(print_selection)
+    print "internal_len: ",len(data)
+
+
+'''
 def data_collection(data,x,y_1,y_2,collect):
     global state
 
@@ -28,7 +55,32 @@ def data_collection(data,x,y_1,y_2,collect):
 
     elif (state=='collecting' and collect==False):
         state='start'   
-   
+'''   
+def data_collection(data,data_buffer,collect,transmission_error):
+    global state
+    global tittle
+
+
+    if (state=='start'and collect==False):
+        x=[]
+        y=[]
+        data_buffer.pop()
+        data_buffer.pop()       
+        data_buffer.append(x)
+        data_buffer.append(y)
+
+        state='start'
+
+    elif (state=='start' and collect==True):
+        state='collecting'
+
+    elif (state=='collecting' and collect==True and transmission_error==False):
+        for i in range(len(data)):
+          data_buffer[i].append(data[i])
+        state='collecting'
+
+    elif (state=='collecting' and collect==False):
+        state='start'   
 
 
 def data_collection_with_timer(data,x,y_1,y_2,collect):
@@ -63,10 +115,78 @@ def data_collection_with_timer(data,x,y_1,y_2,collect):
         return True
 
 
+def print_selection(print_selection):
+    global tag_x
+    global tag_y
+    global tittle    
 
-
-def plot_data(x,y_1,y_2):
+    if print_selection==0:
+        tag_x="Cycles"
+        tag_y="Frequency (Hz)"
+        title="Hall sensor speed"
+    elif print_selection==1:
+        tag_x="isD (A)"
+        tag_y="isQ (A)"
+        title="Stator Current in polar reference"
+    elif print_selection==2:
+        tag_x="VsD (V)"
+        tag_y="VsQ (V)"
+        title="Stator voltage in polar reference"
+    elif print_selection==3:
+        tag_x="Cycles"
+        tag_y="Battery Voltage (V)"
+        title="Battery Voltage"
+    elif print_selection==4:
+        tag_x="psi_sD (Wb)"
+        tag_y="psi_sQ (Wb)"
+        title="Flux-linkage"
+    elif print_selection==5:
+        tag_x="Cycles"
+        tag_y="Electromagnetic torque (Nm)"
+        title="Electromagnetic torque"
+    elif print_selection==6:
+        tag_x="Cycles"
+        tag_y="PI control"
+        title="PI control"
+    elif print_selection==7:
+        tag_x="Cycles"
+        tag_y="Strain gauge torque (Nm)"
+        title="Strain gauge torque"
+    elif print_selection==8:
+        tag_x="Stiffness"
+        tag_y="Damping"
+        title="Impedance control damping and stiffness"
+    elif print_selection==9:
+        tag_x="Cycles"
+        tag_y="Electric angle"
+        title="Electric angle"
+    elif print_selection==10:
+        tag_x="Cycles"
+        tag_y="isA (A)"
+        title="Phase A current"
+    elif print_selection==11:
+        tag_x="Cycles"
+        tag_y="isB (A)"
+        title="Phase B current"
+    elif print_selection==10:
+        tag_x="Cycles"
+        tag_y="isB (A)"
+        title="Phase B current"
     
+def tag_x_():
+    global tag_x
+    return tag_x
+def tag_y_():
+    global tag_y
+    return tag_y
+
+def plot_data(data_buffer):
+        global tag_x
+        global tag_y
+        global tittle    
+
+        
+        
         rows = 1
         columns = 1 
         subplot_index = 1
@@ -89,11 +209,11 @@ def plot_data(x,y_1,y_2):
         plt.figure(num=1, figsize=plot_figsize,dpi=plot_dpi, facecolor=plot_face_color, edgecolor=plot_edge_color) 
 
         plt.subplot(rows,columns,subplot_index)
-        plt.plot(x,x,plotting_character,label='electric')
-        plt.plot(x,x,plotting_character,label='hall'     ) 
-        plt.title(plot_title)
-        plt.xlabel(x_label)
-        plt.ylabel(y_label)
+        plt.plot(data_buffer[0],data_buffer[1],plotting_character,label='electric')
+        #plt.plot(x,x,plotting_character,label='hall'     ) 
+        plt.title(title)
+        plt.xlabel(tag_x)
+        plt.ylabel(tag_y)
         plt.legend()
         
         plt.savefig(path+datetime.datetime.now().ctime()+"_frequencies" +".jpg")

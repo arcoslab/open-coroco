@@ -70,7 +70,7 @@ class Serial_Stm32(object):
 
             for i in range(len(data)):
                 data[i]=self.get_data_and_checksum()
-
+                
             checksum_stm32 = ord(self.ser.read(bytes))
 
         if (self.checksum_python!=checksum_stm32) or (checksum_stm32==0):
@@ -136,7 +136,7 @@ class Serial_Stm32(object):
 
                 if   split_command[0]=='p': 
                     self.write_a_line(line)
-                    self.print_selection=split_command[1]
+                    self.print_selection=int(split_command[1])
                     
                 elif split_command[0]=='c': 
                     self.collect=True

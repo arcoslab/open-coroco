@@ -88,27 +88,18 @@ void collecting_samples(void)
         data_pi_max=pi_max;
 
         data_strain_gauge=strain_gauge;
+        data_electric_angle          = electric_angle;
+        data_mechanical_angle        = mechanical_angle;
+        data_gear_angle              = gear_angle;
+        data_mechanical_frequency    = mechanical_frequency;
+        data_gear_frequency          = gear_frequency;
 
-        if (print_selection==15)
-        {
-            data_electric_angle          = electric_angle;
-            data_mechanical_angle        = mechanical_angle;
-            data_gear_angle              = gear_angle;
-            data_mechanical_frequency    = mechanical_frequency;
-            data_gear_frequency          = gear_frequency;
-            data_strain_gauge=strain_gauge;
-        }
-        if (print_selection==16)
-        {
-            data_hall_a = hall_a;
-            data_hall_b = hall_b;
-            data_previous_hall_a = previous_hall_a;
-            data_previous_hall_b = previous_hall_b;
-        }
-            data_hall_a = hall_a;
-            data_hall_b = hall_b;
-            data_previous_hall_a = previous_hall_a;
-            data_previous_hall_b = previous_hall_b;
+
+        data_strain_gauge=strain_gauge;
+        data_hall_a = hall_a;
+        data_hall_b = hall_b;
+        data_previous_hall_a = previous_hall_a;
+        data_previous_hall_b = previous_hall_b;
 }
 
 
@@ -147,19 +138,75 @@ void print_regular_data(void)
     char checksum=0;
     printf ("X")   ;
 
-
-
     if      (print_selection==0)
     {
-        //printf ("t")  ;  checksum=           print_float_as_bytes(data_timer                   );
-        //printf ("r")  ;  checksum=checksum  +print_float_as_bytes(data_ref_freq_SVM            );
-        //printf ("h")  ;  checksum=checksum  +print_float_as_bytes(data_CUR_FREQ               );
         checksum=           print_float_as_bytes(data_timer       );
-        checksum=checksum  +print_float_as_bytes(data_ref_freq_SVM);
-        checksum=checksum  +print_float_as_bytes(data_CUR_FREQ    );
+        //checksum=           print_float_as_bytes(data_timer       );
+        checksum=checksum  +print_float_as_bytes(data_CUR_FREQ);
+    }
+    else if (print_selection==1)
+    {
+        checksum=           print_float_as_bytes(data_i_sD );
+        checksum=checksum  +print_float_as_bytes(data_i_sQ );
+    }
+    else if (print_selection==2)
+    {
+        checksum=           print_float_as_bytes(data_V_sD );
+        checksum=checksum  +print_float_as_bytes(data_V_sQ );
+    }
+    else if (print_selection==3)
+    {
+        checksum=           print_float_as_bytes(data_timer       );
+        checksum=checksum  +print_float_as_bytes(data_U_d         );
+    }
+    else if (print_selection==4)
+    {
+        checksum=           print_float_as_bytes(data_psi_sD);
+        checksum=checksum  +print_float_as_bytes(data_psi_sQ);
+    }
+    else if (print_selection==5)
+    {
+        checksum=           print_float_as_bytes(data_timer                   );
+        checksum=checksum  +print_float_as_bytes(data_t_e                     );
+    }
+    else if (print_selection==6)
+    {
+        checksum=           print_float_as_bytes(data_timer                   );
+        checksum=checksum  +print_float_as_bytes(data_pi_control_SVM          );
+    }
+    else if (print_selection==7)
+    {
+        checksum=           print_float_as_bytes(data_timer       );
+        checksum=checksum  +print_float_as_bytes(data_strain_gauge);
+    }
+        else if (print_selection==8)
+    {
+        checksum=           print_float_as_bytes(stiffness                    );
+        checksum=checksum  +print_float_as_bytes(damping                      );
+    }
+        else if (print_selection==9)
+    {
+        checksum=           print_float_as_bytes(data_timer                   );
+        checksum=checksum  +print_float_as_bytes(data_electric_angle          );
+    }
+    else if (print_selection==10)
+    {
+        checksum=           print_float_as_bytes(data_timer);
+        checksum=checksum  +print_float_as_bytes(data_i_sA );
+    }
+    else if (print_selection==11)
+    {
+        checksum=           print_float_as_bytes(data_timer);
+        checksum=checksum  +print_float_as_bytes(data_i_sB );
+    }
+    else if (print_selection==12)
+    {
+        checksum=           print_float_as_bytes(data_timer);
+        checksum=checksum  +print_float_as_bytes(-data_i_sA-data_i_sB         );
     }
 
-    //printf ("k");
+
+
     printf ("%c", checksum);
     printf ("m");
 
