@@ -2,7 +2,8 @@
 
 
 from serial_functions           import Serial_Stm32
-from plotutils                  import *
+from plotutils                  import * 
+#import plotutils
 #from csv_functions              import *
 #from motor_control_functions    import * 
 
@@ -10,11 +11,13 @@ from plotutils                  import *
 
 def main():
     #try:
-        data=[0.0,0.0,0.0]
-        x   =[]
-        y_1 =[]
-        y_2 =[]
-                
+        data=[0,0]
+        x=[]
+        y=[]
+        data_buffer=[]
+        data_buffer.append(x)
+        data_buffer.append(y)     
+  
         collect=False
 
         stm32=Serial_Stm32()
@@ -22,27 +25,35 @@ def main():
         
         while True:
    
+
+            stm32.write_commands_to_stm32()
+  
+            #plot_selection(stm32.print_selection,data,data_buffer)
             stm32.read_data_from_stm32(data)
-
-
-            data_collection           (data,x,y_1,y_2,stm32.collect)
-            stm32.plot=data_collection_with_timer(data,x,y_1,y_2,stm32.test)
-
-            stm32.write_commands_to_stm32()   
+            print_selection(stm32.print_selection)
+            
+            if stm32.test==False: data_collection(data,data_buffer,stm32.collect,stm32.transmission_error)#(data,x,y_1,y_2,stm32.collect)
+    
+            else: stm32.plot=data_collection_with_timer(data,data_buffer,stm32.test,stm32.transmission_error)#(data,x,y_1,y_2,stm32.test)
+            #data_collection(data,data_buffer,stm32.collect)
+ 
+            print_selection(print_selection)
 
             if (stm32.plot==True):
-                plot_data(x,y_1,y_2)
-                log_data=[]
-                log_data.append(x)
-                log_data.append(x)
-                log(log_data)
+                plot_data(data_buffer,stm32.path)
+                                
+               
+            
+                log(data_buffer,stm32.path,title_())
+                                
                 stm32.plot=False
                 stm32.test=False
+            
 
             if (stm32.transmission_error==False):
-                print "time: ",data[0], "ref freq: ",data[1],"hall_frequency: ",data[2]
-
-
+                print tag_x_(),": ",data[0],"  ",tag_y_(),": ",data[1]#,"hall_frequency: ",data[2]
+            #else: 
+            #    print "time: ",data[0], "ref freq: ",data[1]
     #except:
         #print "cua cua"
 

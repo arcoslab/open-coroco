@@ -141,7 +141,7 @@ void print_regular_data(void)
     if      (print_selection==0)
     {
         checksum=           print_float_as_bytes(data_timer       );
-        //checksum=           print_float_as_bytes(data_timer       );
+        //checksum=checksum+           print_float_as_bytes(ref_freq_SVM       );
         checksum=checksum  +print_float_as_bytes(data_CUR_FREQ);
     }
     else if (print_selection==1)

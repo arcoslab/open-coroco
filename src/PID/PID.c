@@ -48,7 +48,7 @@ float   ref_freq_SVM=0.0f;
 
 float   angle_hall1=0.0f;
 float   t_e_ref=0.0f;//-1.5;//-0.9f;//-0.15;//-1.6f;
-int     print_selection              = 15;
+int     print_selection              = 0;
 bool    flux_linkage_capture         = false;
 int     flux_linkage_capture_counter = 0;
 int     flux_linkage_capture_timer   = 0;
@@ -319,26 +319,7 @@ bool dtc_on=true;
 void frequency_input(void)
 {
 
-    counter++;
-    static int counter_stop=0;
-
-    if (motor_stop) {
-      if (CUR_FREQ < FREQ_TO_STOP_MOTOR) {
-
-        
-        if (counter_stop==0)
-        {
-	  printf("Motor Off now\n");
-	  counter_stop=1;
-          first_dtc=true;
-        }
-         motor_off=true;
-	close_loop=false;
-	//ref_freq=START_UP_REF_FREQ; //before 1.0f
-      }
-
-    }
-
+ 
 
      if (receive_a_string(cmd_s) )
      {
@@ -364,248 +345,21 @@ void frequency_input(void)
         }
         
         collecting_speed=true;
-        timer=0;
+        //timer=0;
 
         pi_mode=0;  //speed pi controller
 
-      }	
-
-      //----------------------------------
-      //admittance control
-      #define ADMITTANCE_SCALE 1000000.0f
-      if (strcmp(cmd, "D") == 0)
-      {
-        damping=value/ADMITTANCE_SCALE;
-      }	
-      if (strcmp(cmd, "K") == 0)
-      {
-        stiffness=value/ADMITTANCE_SCALE;
-      }	
-
-
-      if (strcmp(cmd, "E") == 0)
-      {        
-        initial_rotor_position_start=true;
-        collected_permission=true;
-        regular_print=true;
-        dtc_on=true;
-
-        reference_electric_angle    =   value;
-        reference_mechanical_angle  =   reference_electric_angle/pole_pairs_0;
-        reference_gear_angle        =   reference_mechanical_angle/gear_ratio;
-
-        motor_off=false;
-
-        if (reference_electric_angle==0.0f) 
-        { 
-          dtc_on=true;
-        }
-        
-        collecting_speed=true;
-        timer=0;
-        pi_mode=0;  //speed pi controller
-      }	
-
-      if (strcmp(cmd, "M") == 0)
-      {        
-        initial_rotor_position_start=true;
-        collected_permission=true;
-        regular_print=true;
-        dtc_on=true;
-
-        reference_mechanical_angle=value;
-        reference_electric_angle=reference_mechanical_angle*pole_pairs_0;
-        reference_gear_angle=reference_mechanical_angle/gear_ratio;
-
-        motor_off=false;
-
-        if (reference_mechanical_angle==0.0f) 
-        { 
-          dtc_on=true;
-        }
-        
-        collecting_speed=true;
-        timer=0;
-        pi_mode=0;  //speed pi controller
-      }	
-
-      if (strcmp(cmd, "G") == 0)
-      {        
-        reset_strain_gauge_reference=true;        
-
-        initial_rotor_position_start=true;
-        collected_permission=true;
-        regular_print=true;
-        dtc_on=true;
-
-
-
-        motor_off=false;
-
-        if (reference_electric_angle==0.0f) 
-        { 
-          dtc_on=true;
-        }
-        
-        collecting_speed=true;
-        timer=0;
-        pi_mode=0;  //speed pi controller
-
-
-        reference_gear_angle=value;
-        reference_mechanical_angle=reference_gear_angle*gear_ratio;
-        reference_change_electric_angle=reference_mechanical_angle*pole_pairs_0;
-
-        reference_electric_angle=reference_change_electric_angle+electric_angle;
-
-      }	
-
-
-
-
-      //--------------------------------
-
-
-      if (strcmp(cmd, "L") == 0)
-      {
-        load_angle=value;
-      }
-
- 
-
-      if (strcmp(cmd, "Q") == 0)
-      {
-        initial_rotor_position_start=true;
-
-        collected_permission=true;
-        timer=0;
-        //print_selection=0;
-        regular_print=true;
-        dtc_on=true;
-        t_e_ref=value;
-        motor_off=false;
-
-        
-        collecting_speed=true;
-        timer=0;
-
-        pi_mode=1;   //torque pi controller
-      }	 
-
-
-
-
-      if (strcmp(cmd, "c") == 0)
-      {
-        timer=0;
-      }	 
-
-      if (strcmp(cmd, "t") == 0)
-      {
-        timer=0;
-      }	
-      /* 
-      if (strcmp(cmd, "P") == 0)
-      {
-        fake_P_SENSORLESS =value;
-        P_SENSORLESS      = value/10000000.0f;
-        P_DOWN_SENSORLESS = value/10000000.0f;
-        print_selection   = 8;
-      }	
-      */ 
-
-     
-
-
-      /*
-      if (strcmp(cmd, "I") == 0)
-      {
-        fake_I_SENSORLESS =value;
-        I_SENSORLESS      = value/10000000000000000000.0f;
-        I_DOWN_SENSORLESS = value/10000000000000000000.0f;
-        print_selection   = 8;
-      }
-      */
-
-
+      }		
 
       if (strcmp(cmd, "p") == 0)
       {
-        /*
-        if      (value== 0)   {   print_selection= 0;  }   //print frequencies
-        else if (value== 1)   {   print_selection= 1;  }   //print three-phase_currents
-        else if (value== 2)   {   print_selection= 2;  }   //print quadrature and direct currents 
-        else if (value== 3)   {   print_selection= 3;  }   //print quadrature and direct voltage 
-        else if (value== 4)   {   print_selection= 4;  }   //print voltages and voltage angles
-        else if (value== 5)   {   print_selection= 5;  }   //print quadrature, direct and reference flux-linkage 
-        else if (value== 6)   {   print_selection= 6;  }   //print flux-linkage magnitude and  angle
-        else if (value== 7)   {   print_selection= 7;  }   //print electric torque
-        else if (value== 8)   {   print_selection= 8;  }   //print Ud
-        else if (value== 9)   {   print_selection= 9;  }   //print pi control and pi_max
-        else if (value==10)   {   print_selection=10;  }   //print frequencies
-        */
+        
         print_selection=value;
-     }
-
-
-
-      if (strcmp(cmd, "s") == 0)
-      {
-        print_selection=7;
-        regular_print=false;
-        dtc_on=true;
-        ref_freq_SVM=value;
-        motor_off=false;
-        
-        if (ref_freq_SVM==0.0f) 
-        { 
-          dtc_on=true;
-        }
-        
-        collecting_speed=true;
-      }	
-      /*
-      else if (strcmp(cmd, "t") == 0)
-      {
-        dtc_on=true;
-        t_e_ref=value;
-        motor_off=false;
-
-        if (t_e_ref==0.0f) 
-        { 
-          dtc_on=true;
-        }
-        
-        collecting_speed=true;
+        //timer=0;
 
       }	
-       */ 
-
-      else if (strcmp(cmd, "z") == 0)
-      {
-        dtc_on    = true;
-        t_e_ref   = value;
-        motor_off = false;
-
-        if (t_e_ref==0.0f) 
-        { 
-          dtc_on=true;
-        }
-        
-        //collecting_speed=true;
-
-      }	 
+ 
     }
-    if (!close_loop) {
-      while (poll(stdin) > 0) {
-	getc(stdin);
-      }
-    } else {
-      ref_freq=value;
-
-      //printf("Close loop\n");
-    }
-
 
       
 }

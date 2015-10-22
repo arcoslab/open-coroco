@@ -5,7 +5,8 @@ from serial import SerialException
 import sys
 import select
 from byte_to_float import *
-
+import datetime
+import time
 
 class Serial_Stm32(object):
 
@@ -21,6 +22,7 @@ class Serial_Stm32(object):
     plot=False
     test=False
     transmission_error=False
+
     def __init__(self):
         print "initializing Serial_Stm32 class"    
         #self.initializing_values()        
@@ -66,19 +68,33 @@ class Serial_Stm32(object):
         self.checksum_python=0
         checksum_stm32=0
 
-        if(single_character == "X" and single_character!=None):
 
+        while(single_character != "X" or single_character==None):
+            single_character   = self.ser.read(bytes)
+
+        for i in range(len(data)):
+            data[i]=self.get_data_and_checksum()
+            
+        checksum_stm32 = ord(self.ser.read(bytes))
+
+        if (self.checksum_python!=checksum_stm32) or (checksum_stm32==None):#(checksum_stm32==0):
+            self.transmission_error=True 
+
+
+        '''
+        if(single_character == "X" and single_character!=None):
+        
             for i in range(len(data)):
                 data[i]=self.get_data_and_checksum()
                 
             checksum_stm32 = ord(self.ser.read(bytes))
 
-        if (self.checksum_python!=checksum_stm32) or (checksum_stm32==0):
+        if (self.checksum_python!=checksum_stm32) or (checksum_stm32==None):#(checksum_stm32==0):
             self.transmission_error=True 
 
         #elif ( (checksum_stm32!=0) and (self.checksum_python==checksum_stm32) ):
         #    self.transmission_error=False
-
+        '''
 
 
     def get_data_and_checksum(self):
@@ -140,7 +156,14 @@ class Serial_Stm32(object):
                     
                 elif split_command[0]=='c': 
                     self.collect=True
-                    
+                
+                    self.root_path = "./measures/"
+                    self.path      =self.root_path + "["+datetime.datetime.now().ctime() +"]"+'/'
+
+                elif split_command[0]=='C': 
+                    self.collect=True
+                   
+                
                 elif split_command[0]=='e': 
                     self.collect=False
                     self.plot   =True 
@@ -148,11 +171,14 @@ class Serial_Stm32(object):
                 elif split_command[0]=='t': 
                     self.test=True
 
-                    self.ser.write('p')
-                    self.ser.write(' ')
-                    self.ser.write(str(self.print_selection))
-                    self.ser.write('\n')
-                    self.ser.write('\r')       
+                    self.root_path = "./measures/"
+                    self.path      =self.root_path + "["+datetime.datetime.now().ctime() +"]"+'/'
+
+    
+
+                elif split_command[0]=='T': 
+                    self.test=True
+
 
                 else: self.write_a_line(line)
 

@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import datetime
 import time
 import os
+import csv 
 
 state='start'
 state_timer='start'
@@ -11,57 +12,18 @@ tag_x='a'
 tag_y='b'
 title=''
 
-def plot_selection(print_selection,data,data_buffer):
 
-    global tag_x
-    global tag_y
-    global title
-
+def data_collection(data,data_buffer,collect,transmission_error):
+    global state
     
 
-    if (print_selection==0):
-        data.append()
-        
-        x=[]
-        y=[]
-        data_buffer=[]
-        data_buffer.append(x)
-        data_buffer.append(y)
-        tag_x="Cycles"
-        tag_y="Frequency (Hz)"
-        title="Electric Frequency measurde by Hall sensor"
-    print "print_selection: ",int(print_selection)
-    print "internal_len: ",len(data)
-
-
-'''
-def data_collection(data,x,y_1,y_2,collect):
-    global state
 
     if (state=='start'and collect==False):
+
         state='start'
 
     elif (state=='start' and collect==True):
-        x=[]
-        y_1=[]
-        y_2=[]
-        state='collecting'
 
-    elif (state=='collecting' and collect==True):
-        x.append(data[0])
-        y_1.append(data[1])
-        y_2.append(data[2])
-        state='collecting'
-
-    elif (state=='collecting' and collect==False):
-        state='start'   
-'''   
-def data_collection(data,data_buffer,collect,transmission_error):
-    global state
-    global tittle
-
-
-    if (state=='start'and collect==False):
         x=[]
         y=[]
         data_buffer.pop()
@@ -69,9 +31,6 @@ def data_collection(data,data_buffer,collect,transmission_error):
         data_buffer.append(x)
         data_buffer.append(y)
 
-        state='start'
-
-    elif (state=='start' and collect==True):
         state='collecting'
 
     elif (state=='collecting' and collect==True and transmission_error==False):
@@ -83,30 +42,37 @@ def data_collection(data,data_buffer,collect,transmission_error):
         state='start'   
 
 
-def data_collection_with_timer(data,x,y_1,y_2,collect):
+def data_collection_with_timer(data,data_buffer,collect,transmission_error):
     global state_timer
     global start_time
 
-    max_time=5
+    max_time=1
     now=time.time()
     #print "state_timer: ",state_timer, "now: ",now,"start_time: ",start_time
 
     if (state_timer=='start'and collect==False):
+
         state_timer='start'
         return False
 
     elif (state_timer=='start' and collect==True):
+
         x=[]
-        y_1=[]
-        y_2=[]
+        y=[]
+        data_buffer.pop()
+        data_buffer.pop()       
+        data_buffer.append(x)
+        data_buffer.append(y)
+
         state_timer='collecting'
         start_time = time.time()
         return False
 
-    elif (state_timer=='collecting' and collect==True and (now-start_time<max_time) ):
-        x.append(data[0])
-        y_1.append(data[1])
-        y_2.append(data[2])
+    elif (state_timer=='collecting' and collect==True and (now-start_time<max_time) and transmission_error==False):
+
+        for i in range(len(data)):
+          data_buffer[i].append(data[i])
+
         state_timer='collecting'
         return False
 
@@ -118,7 +84,7 @@ def data_collection_with_timer(data,x,y_1,y_2,collect):
 def print_selection(print_selection):
     global tag_x
     global tag_y
-    global tittle    
+    global title    
 
     if print_selection==0:
         tag_x="Cycles"
@@ -179,12 +145,15 @@ def tag_x_():
 def tag_y_():
     global tag_y
     return tag_y
+def title_():
+    global title
+    return title
 
-def plot_data(data_buffer):
+def plot_data(data_buffer,path):
         global tag_x
         global tag_y
         global tittle    
-
+        
         
         
         rows = 1
@@ -195,11 +164,6 @@ def plot_data(data_buffer):
         plot_face_color='w'
         plot_edge_color='k'
         plotting_character     = ''
-        plot_title='frequency vs time'
-        x_label='time (ticks)'
-        y_label='frequency (Hz)'
-        root_path = "./measures/"
-        path      =root_path + "["+datetime.datetime.now().ctime() +"]"+'/'
         plot_name=path
 
 
@@ -216,23 +180,27 @@ def plot_data(data_buffer):
         plt.ylabel(tag_y)
         plt.legend()
         
-        plt.savefig(path+datetime.datetime.now().ctime()+"_frequencies" +".jpg")
+        plt.savefig(path+datetime.datetime.now().ctime()+"_"+title+".jpg")
         plt.close()
     
 
-def log(datos):
+def log(datos,path,title):
+        global tittle
+        global tag_x
+        global tag_y
 
-        root_path = "./measures/"
-        path      =root_path + "["+datetime.datetime.now().ctime() +"]"+'/'
         if not os.path.exists(path):
                 os.makedirs(path)
-        print datos[0]
-        file=open(path+'datos.csv',"wb")#,a)
-        
 
-        i=0
-        for x in datos[0] :
+        log_file=open(path+datetime.datetime.now().ctime()+"_"+title+'_data.csv',"wb")#,a)
+        writer   = csv.writer(log_file, delimiter=';',quotechar=' ', quoting=csv.QUOTE_MINIMAL)
+
+        writer.writerow( (tag_x,tag_y) )
+
+        for i in range(len(datos[0])):
             
-            file.write(str(datos[0][i]) + ';'+  str(datos[1][i]))
-            i=i+1    
-        file.close()
+            #writer.writerow(str(datos[0][i]) + ' '+  str(datos[1][i]))
+                        
+            writer.writerow( (str(datos[0][i]),str(datos[1][i]) ))
+              
+        log_file.close()
