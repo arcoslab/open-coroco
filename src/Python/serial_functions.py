@@ -61,10 +61,40 @@ class Serial_Stm32(object):
                 self.connecting=True 	
 
 
-    def read_data_from_stm32(self,data):
+
+    def read_ascii_data_from_stm32(self,data):
+
+        try:
+            
+            line=self.ser.readline() 
+
+            line_split=line.split()   
+
+            for i in range(len(data)):
+                data[i]=float(line_split[i]) 
+
+            self.transmission_error=False
+            
+        except SerialException:
+            #self.transmission_error=True
+            print "transmission error"
+            print"STM32F4 disconnected, cua cua"
+            self.connecting=True 
+            self.connecting_to_stm32F4()
+        except KeyboardInterrupt:
+            print " " 
+            print "Sorry, Ctrl-C..."
+            pass
+        except:
+            self.transmission_error=True
+            print "transmission error"
+            
+
+    def read_data_bytes_from_stm32(self,data):
+        max_floating_value=10000000.0 #2^32 in the stm32
         bytes = 1
         single_character   = self.ser.read(bytes)
-        
+        print_selection=self.print_selection
         self.checksum_python=0
         checksum_stm32=0
 
@@ -78,23 +108,26 @@ class Serial_Stm32(object):
         checksum_stm32 = ord(self.ser.read(bytes))
 
         if (self.checksum_python!=checksum_stm32) or (checksum_stm32==None):#(checksum_stm32==0):
-            self.transmission_error=True 
+                self.transmission_error=True 
 
-
-        '''
-        if(single_character == "X" and single_character!=None):
+        #http://www.gnuplot.info/
+        #HACK!!!!!!!!: 
+        elif (print_selection==0 and (data[0]<1.0                           or data[1]<-500.0   or data[1]>500.0    ) ):  self.transmission_error=True
+        elif (print_selection==1 and (data[0]<-50.0     or data[0]>50.0     or data[1]<-50.0    or data[1]>50.0     ) ):  self.transmission_error=True
+        elif (print_selection==2 and (data[0]<-100.0    or data[0]>100.0    or data[1]<-100.0   or data[1]>100.0    ) ):  self.transmission_error=True
+        elif (print_selection==3 and (data[0]<1.0                           or data[1]<-100.0   or data[1]>100.0    ) ):  self.transmission_error=True
+        elif (print_selection==4 and (data[0]<-10.0     or data[0]>10.0     or data[1]<-10.0    or data[1]>10.0     ) ):  self.transmission_error=True
+        elif (print_selection==5 and (data[0]< 1.0                          or data[1]<-50.0    or data[1]>50.0     ) ):  self.transmission_error=True
+        elif (print_selection==6 and (data[0]<1.0                           or data[1]<-400.0   or data[1]>400.0    ) ):  self.transmission_error=True
+        elif (print_selection==7 and (data[0]<1.0                           or data[1]<-500.0   or data[1]>500.0) ):  self.transmission_error=True
+        elif (print_selection==8 and (data[0]<1.0                           or data[1]<-500.0   or data[1]>500.0) ):  self.transmission_error=True
+        elif (print_selection==9 and (data[0]<1.0                       or data[1]<-360.0*4000.0 or data[1]>360.0*2000.0) ):  self.transmission_error=True
+        elif (print_selection==10 and (data[0]<1.0                          or data[1]<-50.0    or data[1]>50.0) ):  self.transmission_error=True
+        elif (print_selection==11 and (data[0]<1.0                          or data[1]<-50.0    or data[1]>50.0) ):  self.transmission_error=True
+        elif (print_selection==12 and (data[0]<1.0                          or data[1]<-50.0    or data[1]>50.0) ):  self.transmission_error=True
         
-            for i in range(len(data)):
-                data[i]=self.get_data_and_checksum()
-                
-            checksum_stm32 = ord(self.ser.read(bytes))
 
-        if (self.checksum_python!=checksum_stm32) or (checksum_stm32==None):#(checksum_stm32==0):
-            self.transmission_error=True 
 
-        #elif ( (checksum_stm32!=0) and (self.checksum_python==checksum_stm32) ):
-        #    self.transmission_error=False
-        '''
 
 
     def get_data_and_checksum(self):
@@ -180,44 +213,30 @@ class Serial_Stm32(object):
                     self.test=True
 
 
+                elif split_command[0]=='o': 
+                    self.test=True
+                    self.ser.write('d')
+                    self.ser.write(' ')
+                    self.ser.write(split_command[1])
+                    self.ser.write('\n')
+                    self.ser.write('\r') 
+                    
+
+                    self.root_path = "./measures/"
+                    self.path      =self.root_path + "["+datetime.datetime.now().ctime() +"]"+'/'
+
+                elif split_command[0]=='O': 
+                    self.test=True
+                    self.ser.write('d')
+                    self.ser.write(' ')
+                    self.ser.write(split_command[1])
+                    self.ser.write('\n')
+                    self.ser.write('\r')                    
+
+
+
                 else: self.write_a_line(line)
 
                 
 
-            
-                '''
-                #updating reference frequency
-                if     split_command[0]=='d':   self.write_a_line(line)
-                elif   split_command[0]=='D':   self.write_a_line(line)
-                elif   split_command[0]=='K':   self.write_a_line(line)
-                elif   split_command[0]=='G':   self.write_a_line(line)
-                #capturing data into csv
-                elif   split_command[0]=='c':
-                    self.tag_comment       =line+self.aditional_comment+self.print_selection_tags()#raw_input("Enter comment: ") 
-                    self.path              =self.root_path + "["+datetime.datetime.now().ctime() +"] ["+self.tag_comment+"]"+'/'  
-
-                elif   split_command[0]=='C':   self.capture_c_button = True
-                elif split_command[0]=='f': self.end_capturing_data()
-
-                #selecting what to print
-                elif split_command[0]=='p': self.print_selection_setup(int(split_command[1]))
-
-
-
-                elif split_command[0]=='one':
-                    self.test_command='d'#'G';
-                    self.start_test=True;
-                    self.print_selection_setup(int(split_command[2]))
-                    self.test_frequency    =split_command[1]
-                    self.tag_comment       =line+self.aditional_comment#raw_input("Enter comment: ") 
-                    self.path              =self.root_path + "["+datetime.datetime.now().ctime() +"] ["+self.tag_comment+"]"+'/'  
-
-
-                elif split_command[0]=='ONE':
-                    
-                    self.start_test=True;
-                    self.print_selection_setup(int(split_command[2]))
-                    self.test_frequency    =split_command[1]
-                    self.tag_comment       =line+self.aditional_comment#raw_input("Enter comment: ") 
-                    #self.path              =self.root_path + "["+datetime.datetime.now().ctime() +"] ["+self.tag_comment+"]"+'/'  
-                '''
+        

@@ -20,6 +20,7 @@
 void collecting_floating_data(void);
 void collecting_samples(void);
 void print_regular_data(void);
+void print_ascii_data(void);
 char print_float_as_bytes(float value);
 
 

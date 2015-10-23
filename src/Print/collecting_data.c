@@ -112,27 +112,7 @@ union float_union_t
 
 
 
-/*
-void print_regular_data(void)
-{
-    char checksum=0;
-    printf ("X")   ;
 
-
-
-    if      (print_selection==0)
-    {
-        printf ("t")  ;  checksum=           print_float_as_bytes(data_timer                   );
-        printf ("r")  ;  checksum=checksum  +print_float_as_bytes(data_ref_freq_SVM            );
-        printf ("e")  ;  checksum=checksum  +print_float_as_bytes(data_w_r                     );
-        printf ("h")  ;  checksum=checksum  +print_float_as_bytes(data_CUR_FREQ               );
-    }
-    printf ("k");
-    printf ("%c", checksum);
-    printf ("m");
-
-}
-*/
 void print_regular_data(void)
 {
     char checksum=0;
@@ -233,3 +213,27 @@ char print_float_as_bytes(float floating_value)
     }
     return checksum;
 }
+
+
+
+
+
+void print_ascii_data(void)
+{
+    if      (print_selection==0)    printf("%10.0f %3.2f \n",data_timer,data_CUR_FREQ);
+    else if (print_selection==1)    printf(" %3.2f %3.2f \n",data_i_sD,data_i_sQ);
+    else if (print_selection==2)    printf(" %3.2f %3.2f \n",data_V_sD,data_V_sQ);
+    else if (print_selection==3)    printf("%10.0f %3.2f \n",data_timer,data_U_d);
+    else if (print_selection==4)    printf("%1.6f %1.6f \n",data_psi_sD,data_psi_sQ);
+    else if (print_selection==5)    printf("%10.0f %3.3f \n",data_timer,data_t_e);
+    else if (print_selection==6)    printf("%10.0f %3.5f \n",data_timer,data_pi_control_SVM);
+    else if (print_selection==7)    printf("%10.0f %3.3f \n",data_timer,data_strain_gauge);
+    else if (print_selection==8)    printf("%10.2f %10.2f \n",stiffness,damping);
+    else if (print_selection==9)    printf("%10.0f %10.2f \n",data_timer,data_electric_angle);
+    else if (print_selection==10)   printf("%10.0f %3.2f \n",data_timer,data_i_sA);
+    else if (print_selection==11)   printf("%10.0f %3.2f \n",data_timer,data_i_sB);
+    else if (print_selection==12)   printf("%10.0f %3.2f \n",data_timer,-data_i_sA-data_i_sB);
+    else                            printf("%10.0f %10.0f \n",data_timer,data_timer);  
+}
+
+

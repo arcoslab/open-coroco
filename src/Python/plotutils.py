@@ -45,8 +45,7 @@ def data_collection(data,data_buffer,collect,transmission_error):
 def data_collection_with_timer(data,data_buffer,collect,transmission_error):
     global state_timer
     global start_time
-
-    max_time=1
+    max_time=5
     now=time.time()
     #print "state_timer: ",state_timer, "now: ",now,"start_time: ",start_time
 
@@ -134,9 +133,9 @@ def print_selection(print_selection):
         tag_x="Cycles"
         tag_y="isB (A)"
         title="Phase B current"
-    elif print_selection==10:
+    elif print_selection==12:
         tag_x="Cycles"
-        tag_y="isB (A)"
+        tag_y="isC (A)"
         title="Phase B current"
     
 def tag_x_():
