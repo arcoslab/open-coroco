@@ -4,9 +4,22 @@ import serial
 from serial import SerialException
 import sys
 import select
-from byte_to_float import *
+#from byte_to_float import *
 import datetime
 import time
+import struct
+
+def bytes_to_float(string_of_bytes):
+    #print "entering bytes to float"
+    if len(string_of_bytes)<4:  #if there are not 4 bytes then it cannot be translated into a float and therefore an error is obtained
+        #print  "byte_to_float: there are less than four bytes "        
+        return (False,25.0)
+    else:
+        tuplet_float= struct.unpack_from('f',string_of_bytes)   #uncompress string of 4 bytes into a floting number
+        #print "byte_to_float: " + str(tuplet_float[0])
+        return (True,tuplet_float[0])
+
+
 
 class Serial_Stm32(object):
 
@@ -88,7 +101,17 @@ class Serial_Stm32(object):
         except:
             self.transmission_error=True
             print "transmission error"
-            
+ 
+    def bytes_to_float(string_of_bytes):
+        #print "entering bytes to float"
+        if len(string_of_bytes)<4:  #if there are not 4 bytes then it cannot be translated into a float and therefore an error is obtained
+            #print  "byte_to_float: there are less than four bytes "        
+            return (False,25.0)
+        else:
+            tuplet_float= struct.unpack_from('f',string_of_bytes)   #uncompress string of 4 bytes into a floting number
+            #print "byte_to_float: " + str(tuplet_float[0])
+            return (True,tuplet_float[0])
+              
 
     def read_data_bytes_from_stm32(self,data):
         max_floating_value=10000000.0 #2^32 in the stm32
