@@ -337,6 +337,13 @@ float L_sq       = L_s_q_0;
 float psi_F      = psi_F_0;
 
 
+//values calculated with i neglected
+float psi_sD_i_neglected=0.0f;
+float psi_sQ_i_neglected=0.0f;
+float te_i_neglected=0.0f;
+float wr_i_neglected=0.0f;
+
+
 void shutdown_counter(float ref_frequency,bool* shutdown)
 {   
     #define INITIAL     0
@@ -487,7 +494,7 @@ float SVM_speed_close_loop_of_voltage_frequency(float reference_frequency, float
 #define IS_ANGLE_OFFSET_1 (0.0f)  //
 #define ISD_CORRECTION (1.0f)
 #define ISQ_CORRECTION (1.15574f)
-void  DTC_SVM(void)
+void  DTC_SVM_hall_sensor_only(void)
 {
 
 static bool shutdown=true;
@@ -592,4 +599,143 @@ else
 }
 
 
+
+
+
+
+
+
+
+void  DTC_SVM(void)
+{
+
+static bool shutdown=true;
+static bool increase_flux  = false;
+
+if (center_aligned_state==FIRST_HALF)
+{
+
+  //----------Frequency estimation with hall sensors--------------------
+  hall_freq=frequency_direction_two_hall_sensors_AB(CUR_FREQ);
+
+
+
+  //--------------Flux-linkage estimation-------------------------------------------------------------------
+  i_sD     = direct_stator_current_i_sD     (i_sA);
+  i_sQ     = quadrature_stator_current_i_sQ (i_sA,i_sB);
+
+
+  //flux_linkage_estimator(2.0f*TICK_PERIOD,V_sD,V_sQ,i_sD,i_sQ,R_s,&psi_sD,&psi_sQ);
+  flux_linkage_estimator(2.0f*TICK_PERIOD,V_sD,V_sQ,i_sD,i_sQ,R_s,CUR_FREQ,&psi_sD,&psi_sQ,&psi_s,&psi_s_alpha_SVM);
+  //flux_linkage_estimator_neglected_currents (2.0f*TICK_PERIOD,V_sD,V_sQ,&psi_sD_i_neglected,&psi_sQ_i_neglected);
+       
+  psi_sD=direct_stator_flux_linkage_estimator_psi_sD(2.0f*TICK_PERIOD,V_sD,i_sD,R_s);//,float electric_frequency)
+  psi_sQ=direct_stator_flux_linkage_estimator_psi_sD(2.0f*TICK_PERIOD,V_sQ,i_sQ,R_s);//,float electric_frequency)
+  
+  w_r = 0.15915494309189533576f*rotor_speed_w_r (psi_sD,psi_sQ,TICK_PERIOD*2.0f);
+  w_r = wr_moving_average_filter(w_r); 
+  t_e       = electromagnetic_torque_estimation_t_e   (psi_sD,i_sQ,psi_sQ,i_sD,pole_pairs);
+
+
+  //flux_linkage_estimator_neglected_currents (2.0f*TICK_PERIOD,V_sD,V_sQ,&psi_sD_i_neglected,&psi_sQ_i_neglected);
+  flux_linkage_estimator_neglected_currents (2.0f*TICK_PERIOD,V_sD,V_sQ,&psi_sD_i_neglected,&psi_sQ_i_neglected);  
+  wr_i_neglected = 0.15915494309189533576f*rotor_speed_w_r (psi_sD_i_neglected,psi_sQ_i_neglected,TICK_PERIOD*2.0f);
+  w_r_neglected = wr_neglected_moving_average_filter(w_r_neglected); 
+  //t_e       = electromagnetic_torque_estimation_t_e   (psi_sD,i_sQ,psi_sQ,i_sD,pole_pairs);
+  te_i_neglected = electromagnetic_torque_estimation_t_e   (psi_sD_i_neglected,i_sQ,psi_sQ_i_neglected,i_sD,pole_pairs);
+  //t_e =  te_moving_average_filter(t_e);
+  psi_s_ref=psi_F;
+
+} 
+
+
+else
+{
+  /**************************************************************/
+  /*********Admitance Controller*********************************/
+  /**************************************************************/
+  /*ref_freq_SVM = admittance_controller    (
+                                            stiffness,
+                                            damping,
+                                            reference_electric_angle,
+                                            electric_angle,
+                                            strain_gauge
+                                            );
+  */
+
+
+
+  
+  electric_angle= electric_angle+ 
+                            /*SVM with PID controller on the frequency calculated with the hall sensor*/
+                            SVM_speed_close_loop_of_voltage_frequency   (ref_freq_SVM,hall_freq,true,&V_sD,&V_sQ,U_d,shutdown); 
+  
+  #define MAX_GEAR_CYCLES 100.0f
+
+  if (reference_electric_angle>=360.0f*pole_pairs*gear_ratio*MAX_GEAR_CYCLES)
+    reference_electric_angle=reference_electric_angle-360.0f*pole_pairs*gear_ratio*MAX_GEAR_CYCLES;
+  if (electric_angle<-  360.0f*pole_pairs*gear_ratio*MAX_GEAR_CYCLES)
+    reference_electric_angle=reference_electric_angle+360.0f*pole_pairs*gear_ratio*MAX_GEAR_CYCLES;              
+
+  if (electric_angle>=360.0f*pole_pairs*gear_ratio*MAX_GEAR_CYCLES)
+    electric_angle=electric_angle-360.0f*pole_pairs*gear_ratio*MAX_GEAR_CYCLES;
+  if (electric_angle<-360.0f*pole_pairs*gear_ratio*MAX_GEAR_CYCLES)
+    electric_angle=electric_angle+360.0f*pole_pairs*gear_ratio*MAX_GEAR_CYCLES;
+
+
+
+
+
+
+
+ //----------------------------------PWM with SVM (do not touch)--------------------------------------------------//
+
+  fast_vector_angle_and_magnitude(V_sQ,V_sD,&V_s,&cita_V_s);
+
+  required_V_sD     =   V_sD;
+  required_V_sQ     =   V_sQ;
+  required_V_s      =   V_s;
+  required_cita_V_s =   cita_V_s;
+
+
+  SVM_Maximum_allowed_V_s_ref (&V_sD,&V_sQ,&V_s,U_d*UD_PERCENTAGE,&increase_flux);//0.70f);
+  V_s_ref_relative_angle = SVM_V_s_relative_angle      (cita_V_s);
+
+
+  float V_s_duty_cycle=0.0f;
+  float U_max=0.0f;
+  V_s_duty_cycle=V_s/(0.66666666666666666666f*U_d); //V_s_duty_cycle=V_s/( (2.0f/3.0f) *U_d);
+  U_max=U_d*0.66666666666666666666f;
+
+  T1       = SVM_T1       (V_s_duty_cycle,V_s,U_max, V_s_ref_relative_angle);
+  T2       = SVM_T2       (V_s_duty_cycle,V_s,U_max, V_s_ref_relative_angle);
+  
+
+  T_min_on =SVM_T_min_on (1.0f, T1, T2); //T_min_on = SVM_T_min_on (1.0f, T1, T2);
+  T_med_on =SVM_T_med_on (T_min_on, T1,T2,cita_V_s);
+  T_max_on =SVM_T_max_on (T_med_on,T1,T2,cita_V_s);
+
+  SVM_phase_duty_cycles           (&duty_a, &duty_b, &duty_c, cita_V_s,T_max_on,T_med_on,T_min_on);
+  
+  //duty_a=0.5f;
+  //duty_b=0.5f;
+  //duty_c=0.5f;
+
+  
+
+  shutdown_counter(ref_freq_SVM,&shutdown);
+  SVM_voltage_switch_inverter_VSI ( duty_a,  duty_b,  duty_c,shutdown);
+}
+
+
+if (center_aligned_state==FIRST_HALF)
+{
+  center_aligned_state=SECOND_HALF;
+}
+else 
+{
+  center_aligned_state=FIRST_HALF;
+}
+
+}
 

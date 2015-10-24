@@ -82,7 +82,7 @@ void shutdown_counter(float ref_freq_SVM,bool* shutdown);
 
 void  SVM_voltage_switch_inverter_VSI (float duty_A,float duty_B,float duty_C,bool shutdown);
 void  DTC_SVM                         (void);
-
+void  DTC_SVM_hall_sensor_only(void);
 
 void speed_PID_no_SVM(void);
 

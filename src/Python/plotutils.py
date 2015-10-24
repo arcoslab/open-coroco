@@ -137,7 +137,23 @@ def print_selection(print_selection):
         tag_x="Cycles"
         tag_y="isC (A)"
         title="Phase B current"
-    
+    elif print_selection==13:
+        tag_x="Cycles"
+        tag_y="Frequency (Hz)"
+        title="Electromagnetic frequency"   
+    elif print_selection==14:
+        tag_x="Cycles"
+        tag_y="Frequency (Hz)"
+        title="Electromagnetic frequency with i neglected" 
+    elif print_selection==15:
+        tag_x="psi_sD (Wb)"
+        tag_y="psi_sQ (Wb)"
+        title="Flux-linkage with i neglected"
+    elif print_selection==16:
+        tag_x="Cycles"
+        tag_y="Electromagnetic torque (Nm)"
+        title="Electromagnetic torque with i neglected"
+
 def tag_x_():
     global tag_x
     return tag_x

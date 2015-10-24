@@ -58,7 +58,8 @@ def main():
                     
 
                 if (stm32.transmission_error==False):
-                    print tag_x_(),": ",data[0],"  ",tag_y_(),": ",data[1]#,"hall_frequency: ",data[2]
+                    #print tag_x_(),": ",data[0],"  ",tag_y_(),": ",data[1],"  ",title_()#,"hall_frequency: ",data[2]
+                    print tag_x_(),": %10.2f" %data[0],"  ",tag_y_(),": %10.2f" %data[1],"  ",title_(),"   print#: ",stm32.print_selection#,"hall_frequency: ",data[2]
 
             except KeyboardInterrupt:
                 print " " 
