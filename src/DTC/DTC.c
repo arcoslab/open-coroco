@@ -89,7 +89,7 @@ void  floating_switching_states (float* S_A, float* S_B, float* S_C)
 
 //---------------------stator flux-linkage space vector estimation-------------------------------
 #define PI_CTE 3.14159265359f 
-#define F_CUTOFF 100.0f//5.0f
+#define F_CUTOFF 5.0f//5.0f
 #define W_CUTOFF (2.0f*PI_CTE*F_CUTOFF)
 #define CTE (150.0f)  
 #define K_LPF  0.2f
@@ -102,232 +102,30 @@ void  floating_switching_states (float* S_A, float* S_B, float* S_C)
 
 
 
-float direct_stator_flux_linkage_estimator_psi_sD     (float T,float V_sD,float i_sD,float R_s)//,float electric_frequency)
+float direct_stator_flux_linkage_estimator_psi_sD     (float T,float V_sD,float i_sD,float R_s,float psi_sD)
 {
-  static float previous_psi_sD=0.0f;
-
-  //if (electric_frequency<1.0f) electric_frequency=1.0f;
-
-  //if (electric_frequency<=200.0f) electric_frequency=200.0f;
-
-/*
-  if (electric_frequency>=0) previous_psi_sD = ( previous_psi_sD+T*(V_sD-i_sD*R_s) )/(1.0f+T*( K_LPF*2.0f*PI_CTE*electric_frequency));
-  else                       previous_psi_sD = ( previous_psi_sD+T*(V_sD-i_sD*R_s) )/(1.0f+T*(-K_LPF*2.0f*PI_CTE*electric_frequency));
-*/                     
-  previous_psi_sD = ( previous_psi_sD+T*(V_sD-i_sD*R_s) )/(1.0f+T*W_CUTOFF);
-  //previous_psi_sD = ( previous_psi_sD+T*(V_sD-i_sD*R_s) )*(1.0f-2.0f*PI_CTE*F_CUTOFF*T);
-
-
-
-  //previous_psi_sD = previous_psi_sD *sqrtf(1.0f+W_CUTOFF*W_CUTOFF/(electric_frequency*electric_frequency) );
-  
-
-  return previous_psi_sD;
+  return (psi_sD+T*(V_sD-i_sD*R_s) )/(1.0f+T*W_CUTOFF);
 }
 
-float quadrature_stator_flux_linkage_estimator_psi_sQ (float T,float V_sQ,float i_sQ,float R_s)//,float electric_frequency)
+float quadrature_stator_flux_linkage_estimator_psi_sQ (float T,float V_sQ,float i_sQ,float R_s, float psi_sQ)
 {
-  static float previous_psi_sQ=0.0f;
-
-    //if (electric_frequency<=1.0f) electric_frequency=1.0f;
-
-  //previous_psi_sQ = ( previous_psi_sQ+T*(V_sQ-i_sQ*R_s) )/(1.0f+T*(electric_frequency*CTE));
-  previous_psi_sQ = ( previous_psi_sQ+T*(V_sQ-i_sQ*R_s) )/(1.0f+T*W_CUTOFF);
-
-/*
-  if (electric_frequency>=0)  previous_psi_sQ=( previous_psi_sQ+T*(V_sQ-i_sQ*R_s) )*(1.0f+T*( K_LPF*2.0f*PI_CTE*electric_frequency));
-  else                        previous_psi_sQ=( previous_psi_sQ+T*(V_sQ-i_sQ*R_s) )*(1.0f+T*( K_LPF*2.0f*PI_CTE*electric_frequency));
-*/     
-/*
-  if (electric_frequency<1.0f) electric_frequency=1.0f;
-
-  previous_psi_sQ = previous_psi_sQ *sqrtf(1.0f+W_CUTOFF*W_CUTOFF/(electric_frequency*electric_frequency) );
-*/
-  return previous_psi_sQ;
+  return (psi_sQ+T*(V_sQ-i_sQ*R_s) )/(1.0f+T*W_CUTOFF);
 }
 
 
 void fast_vector_angle_and_magnitude(float y,float x, float* magnitude, float* angle)
 {
-    //if (x!=x) x=0.0f;
-    //if (y!=y) y=0.0f;
-
     *angle=fast_vector_angle(y,x);
-
-    //if (*angle!=*angle) *angle=0.0f;
-
     *magnitude=x/fast_cos(*angle);
-
-    //if (*magnitude!=*magnitude) *magnitude=0.0f; 
 }
 
 
-void flux_linkage_estimator (float T,float V_sD,float V_sQ,float i_sD,float i_sQ,float R_s,float electric_frequency, float* psisD, float* psisQ, float*psis,float* psis_alpha)
+float rotor_speed_w_r(float psi_sD, float psi_sQ, float T, float previous_psi_sD,float previous_psi_sQ)
 {
-  static float previous_psi_sD=0.0f;
-  static float previous_psi_sQ=0.0f;
-
-  float LPF_psi_sD=0.0f;
-  float LPF_psi_sQ=0.0f;
-  float LPF_lag_angle=0.0f;
-
-  float LPF_psi_s_alpha=0.0f;
-  float LPF_psi_s=0.0f;
-
-
-
-  //fixed cutoff frequency
-    //LPF_psi_sD = ( previous_psi_sD+T*(V_sD-i_sD*R_s) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));
-    //LPF_psi_sQ = ( previous_psi_sQ+T*(V_sQ-i_sQ*R_s) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));   
-
-
-  if (K_LPF*electric_frequency<5.0f)
-  {
-    LPF_psi_sD = ( previous_psi_sD+T*(V_sD-i_sD*R_s) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));
-    LPF_psi_sQ = ( previous_psi_sQ+T*(V_sQ-i_sQ*R_s) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));   
-    //LPF_psi_sD = ( previous_psi_sD+T*(V_sD) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));
-    //LPF_psi_sQ = ( previous_psi_sQ+T*(V_sQ) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));   
-  }
-  else 
-  {
-    LPF_psi_sD = ( previous_psi_sD+T*(V_sD-i_sD*R_s) )/(1.0f+T*( K_LPF*2.0f*PI_CTE*electric_frequency));
-    LPF_psi_sQ = ( previous_psi_sQ+T*(V_sQ-i_sQ*R_s) )/(1.0f+T*( K_LPF*2.0f*PI_CTE*electric_frequency));
-    //LPF_psi_sD = ( previous_psi_sD+T*(V_sD) )/(1.0f+T*( K_LPF*2.0f*PI_CTE*electric_frequency));
-    //LPF_psi_sQ = ( previous_psi_sQ+T*(V_sQ) )/(1.0f+T*( K_LPF*2.0f*PI_CTE*electric_frequency)); 
-  }
-/**/
-
-
-  //LPF_psi_sD = ( previous_psi_sD+T*(V_sD) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));
-  //LPF_psi_sQ = ( previous_psi_sQ+T*(V_sQ) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));
-
-
-  //LPF_psi_s       = stator_flux_linkage_magnite_psi_s               (LPF_psi_sD,LPF_psi_sQ);
-  //LPF_psi_s_alpha = fast_vector_angle                               (LPF_psi_sQ,LPF_psi_sD);
-  //LPF_lag_angle   = 1.0f;
-
-/*
-    LPF_psi_sD = ( previous_psi_sD+T*(V_sD-i_sD*R_s) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));
-    LPF_psi_sQ = ( previous_psi_sQ+T*(V_sQ-i_sQ*R_s) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF)); 
-*/
-
-  fast_vector_angle_and_magnitude(LPF_psi_sQ,LPF_psi_sD,&LPF_psi_s,&LPF_psi_s_alpha);
-  LPF_lag_angle   = 0.0f;
-
-  *psis       = LPF_psi_s;
-  *psis_alpha = LPF_psi_s_alpha+LPF_lag_angle;
-
-  previous_psi_sD = LPF_psi_s*fast_cos (*psis_alpha);
-  previous_psi_sQ = LPF_psi_s*fast_sine(*psis_alpha);
-
-  *psisD=previous_psi_sD;
-  *psisQ=previous_psi_sQ;
-
-/*
-//fixed wcutoff, no lag compensation
-
-  LPF_psi_sD = ( previous_psi_sD+T*(V_sD-i_sD*R_s) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));
-  LPF_psi_sQ = ( previous_psi_sQ+T*(V_sQ-i_sQ*R_s) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));
-
-  previous_psi_sD=LPF_psi_sD;
-  previous_psi_sQ=LPF_psi_sQ;
-
-  *psisD=previous_psi_sD;
-  *psisQ=previous_psi_sQ;
-*/
-
-//no filter, neglecting currents
-/*
-  LPF_psi_sD = ( previous_psi_sD+T*(V_sD-i_sD*R_s) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));
-  LPF_psi_sQ = ( previous_psi_sQ+T*(V_sQ-i_sD*R_s) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));
-
-  //LPF_psi_sD = ( previous_psi_sD+T*(V_sD) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));
-  //LPF_psi_sQ = ( previous_psi_sQ+T*(V_sQ) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));
-
-  previous_psi_sD=LPF_psi_sD;
-  previous_psi_sQ=LPF_psi_sQ;
-
-  *psisD=previous_psi_sD;
-  *psisQ=previous_psi_sQ;
-*/
-}
-
-
-void flux_linkage_estimator_neglected_currents (float T,float V_sD,float V_sQ, float* psisD, float* psisQ)//, float*psis,float* psis_alpha)
-{
-  static float previous_psi_sD=0.0f;
-  static float previous_psi_sQ=0.0f;
-
-  static float previous_VsD=0.0f;
-  static float previous_VsQ=0.0f;
-
-/*
-  if (K_LPF*electric_frequency<5.0f)
-  {
-    *psisD = ( previous_psi_sD+T*(V_sD) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));
-    *psisQ = ( previous_psi_sQ+T*(V_sQ) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));   
-  }
-  else 
-  {
-    *psisD = ( previous_psi_sD+T*(V_sD) )/(1.0f+T*( K_LPF*2.0f*PI_CTE*electric_frequency));
-    *psisQ = ( previous_psi_sQ+T*(V_sQ) )/(1.0f+T*( K_LPF*2.0f*PI_CTE*electric_frequency)); 
-  }
-*/    
-    *psisD = ( previous_psi_sD+T*(V_sD) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));
-    *psisQ = ( previous_psi_sQ+T*(V_sQ) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));   
-
-  //fast_vector_angle_and_magnitude(*psisQ,*psisD,psis,psis_alpha);
-
-
-    if (*psisD!=*psisD)   
-    { 
-        *psisD = ( previous_psi_sD+T*(previous_VsD) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));
-        *psisQ = ( previous_psi_sQ+T*(previous_VsQ) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));
-    }
-    if (*psisQ!=*psisQ)     
-    {
-        *psisD = ( previous_psi_sD+T*(previous_VsD) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));
-        *psisQ = ( previous_psi_sQ+T*(previous_VsQ) )/(1.0f+T*( 2.0f*PI_CTE*F_CUTOFF));
-    }
-
-    previous_psi_sD = *psisD;
-    previous_psi_sQ = *psisQ;
-
-    previous_VsD=V_sD;
-    previous_VsQ=V_sQ;
-
-  if (V_sD!=V_sD || V_sQ!=V_sQ )
-    t_e_ref=66.0f;
-  else if (psisD!=psisD && psisQ!=psisQ)
-  {
-   t_e_ref=55.0f;
-   //psi_sD_i_neglected=0.0f;
-   //psi_sD_i_neglected=0.0f;
-  }
-  else if (*psisD!=*psisD)
-   t_e_ref=V_sD;
-  else if (*psisQ!=*psisQ)
-   t_e_ref=33.0f;
-
-}
-
-
-
-
-float rotor_speed_w_r(float psi_sD, float psi_sQ, float T)
-{
-  static float previous_psi_sD=0.0f;
-  static float previous_psi_sQ=0.0f;
   float w_=0.0f;
   w_=(previous_psi_sD*psi_sQ-previous_psi_sQ*psi_sD)/(T*(psi_sD*psi_sD+psi_sQ*psi_sQ));
-  previous_psi_sD=psi_sD;
-  previous_psi_sQ=psi_sQ;
   return w_;
 }
-
-
-
-
 
 //electromagnetic torque estimation
 float electromagnetic_torque_estimation_t_e(float psi_sD,float i_sQ, float psi_sQ,float i_sD,float pole_pairs)

@@ -103,9 +103,10 @@ void collecting_samples(void)
         data_previous_hall_b = previous_hall_b;
 
     //-------values calculated with i neglected-----
-        data_psi_sD_i_neglected=psi_sD_i_neglected;
-        data_psi_sQ_i_neglected=psi_sQ_i_neglected;
-        data_wr_i_neglected=wr_i_neglected;
+        data_psi_sD_i_neglected=psi_sD_NO_i;
+        data_psi_sQ_i_neglected=psi_sQ_NO_i;
+        data_wr_i_neglected=w_r_NO_i;
+        
 }
 
 

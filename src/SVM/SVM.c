@@ -338,10 +338,17 @@ float psi_F      = psi_F_0;
 
 
 //values calculated with i neglected
+/*
 float psi_sD_i_neglected=0.0f;
 float psi_sQ_i_neglected=0.0f;
 float te_i_neglected=0.0f;
 float wr_i_neglected=0.0f;
+*/
+float psi_sD_NO_i=0.0f;
+float psi_sQ_NO_i=0.0f;
+float t_e_NO_i=0.0f;
+float w_r_NO_i=0.0f;
+
 
 
 void shutdown_counter(float ref_frequency,bool* shutdown)
@@ -618,23 +625,40 @@ if (center_aligned_state==FIRST_HALF)
   //----------Frequency estimation with hall sensors--------------------
   hall_freq=frequency_direction_two_hall_sensors_AB(CUR_FREQ);
 
-
-
-  //--------------Flux-linkage estimation-------------------------------------------------------------------
+  //----------Current estimationn---------------------------------------
   i_sD     = direct_stator_current_i_sD     (i_sA);
   i_sQ     = quadrature_stator_current_i_sQ (i_sA,i_sB);
 
 
-  //flux_linkage_estimator(2.0f*TICK_PERIOD,V_sD,V_sQ,i_sD,i_sQ,R_s,&psi_sD,&psi_sQ);
-  flux_linkage_estimator(2.0f*TICK_PERIOD,V_sD,V_sQ,i_sD,i_sQ,R_s,CUR_FREQ,&psi_sD,&psi_sQ,&psi_s,&psi_s_alpha_SVM);
-  //flux_linkage_estimator_neglected_currents (2.0f*TICK_PERIOD,V_sD,V_sQ,&psi_sD_i_neglected,&psi_sQ_i_neglected);
-       
-  //psi_sD=direct_stator_flux_linkage_estimator_psi_sD(2.0f*TICK_PERIOD,V_sD,i_sD,R_s);//,float electric_frequency)
-  //psi_sQ=quadrature_stator_flux_linkage_estimator_psi_sQ(2.0f*TICK_PERIOD,V_sQ,i_sQ,R_s);//,float electric_frequency)
+  //--------------Flux-linkage estimation-------------------------------------------------------------------
+
+  static float previous_psi_sD=0.0f;      
+  static float previous_psi_sQ=0.0f;
+
+  previous_psi_sD=psi_sD;
+  previous_psi_sQ=psi_sQ;
   
-  w_r = 0.15915494309189533576f*rotor_speed_w_r (psi_sD,psi_sQ,TICK_PERIOD*2.0f);
+  psi_sD=direct_stator_flux_linkage_estimator_psi_sD    (2.0f*TICK_PERIOD,V_sD,i_sD,R_s,psi_sD);//,float electric_frequency)
+  psi_sQ=quadrature_stator_flux_linkage_estimator_psi_sQ(2.0f*TICK_PERIOD,V_sQ,i_sQ,R_s,psi_sQ);//,float electric_frequency)
+  w_r = 0.15915494309189533576f*rotor_speed_w_r (psi_sD,psi_sQ,TICK_PERIOD*2.0f,previous_psi_sD,previous_psi_sQ);
   //w_r = wr_moving_average_filter(w_r); 
   t_e = electromagnetic_torque_estimation_t_e   (psi_sD,i_sQ,psi_sQ,i_sD,pole_pairs);
+
+  //--------------Flux-linkage estimation neglecting currents--------------------------------------------------
+
+  static float previous_psi_sD_NO_i=0.0f;      
+  static float previous_psi_sQ_NO_i=0.0f;
+
+  previous_psi_sD_NO_i=psi_sD_NO_i;
+  previous_psi_sQ_NO_i=psi_sQ_NO_i;
+  
+  psi_sD_NO_i=direct_stator_flux_linkage_estimator_psi_sD    (2.0f*TICK_PERIOD,V_sD,i_sD,R_s,psi_sD_NO_i);//,float electric_frequency)
+  psi_sQ_NO_i=quadrature_stator_flux_linkage_estimator_psi_sQ(2.0f*TICK_PERIOD,V_sQ,i_sQ,R_s,psi_sQ_NO_i);//,float electric_frequency)
+  w_r_NO_i = 0.15915494309189533576f*rotor_speed_w_r (psi_sD,psi_sQ,TICK_PERIOD*2.0f,previous_psi_sD_NO_i,previous_psi_sQ_NO_i);
+  //w_r = wr_moving_average_filter(w_r); 
+  t_e_NO_i = electromagnetic_torque_estimation_t_e   (psi_sD_NO_i,i_sQ,psi_sQ_NO_i,i_sD,pole_pairs);
+
+
 
 
   //flux_linkage_estimator_neglected_currents (2.0f*TICK_PERIOD,V_sD,V_sQ,&psi_sD_i_neglected,&psi_sQ_i_neglected);
