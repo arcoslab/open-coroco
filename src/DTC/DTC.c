@@ -89,7 +89,7 @@ void  floating_switching_states (float* S_A, float* S_B, float* S_C)
 
 //---------------------stator flux-linkage space vector estimation-------------------------------
 #define PI_CTE 3.14159265359f 
-#define F_CUTOFF 5.0f//5.0f
+#define F_CUTOFF 100.0f//5.0f
 #define W_CUTOFF (2.0f*PI_CTE*F_CUTOFF)
 #define CTE (150.0f)  
 #define K_LPF  0.2f

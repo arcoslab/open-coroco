@@ -629,20 +629,22 @@ if (center_aligned_state==FIRST_HALF)
   flux_linkage_estimator(2.0f*TICK_PERIOD,V_sD,V_sQ,i_sD,i_sQ,R_s,CUR_FREQ,&psi_sD,&psi_sQ,&psi_s,&psi_s_alpha_SVM);
   //flux_linkage_estimator_neglected_currents (2.0f*TICK_PERIOD,V_sD,V_sQ,&psi_sD_i_neglected,&psi_sQ_i_neglected);
        
-  psi_sD=direct_stator_flux_linkage_estimator_psi_sD(2.0f*TICK_PERIOD,V_sD,i_sD,R_s);//,float electric_frequency)
-  psi_sQ=direct_stator_flux_linkage_estimator_psi_sD(2.0f*TICK_PERIOD,V_sQ,i_sQ,R_s);//,float electric_frequency)
+  //psi_sD=direct_stator_flux_linkage_estimator_psi_sD(2.0f*TICK_PERIOD,V_sD,i_sD,R_s);//,float electric_frequency)
+  //psi_sQ=quadrature_stator_flux_linkage_estimator_psi_sQ(2.0f*TICK_PERIOD,V_sQ,i_sQ,R_s);//,float electric_frequency)
   
   w_r = 0.15915494309189533576f*rotor_speed_w_r (psi_sD,psi_sQ,TICK_PERIOD*2.0f);
-  w_r = wr_moving_average_filter(w_r); 
-  t_e       = electromagnetic_torque_estimation_t_e   (psi_sD,i_sQ,psi_sQ,i_sD,pole_pairs);
+  //w_r = wr_moving_average_filter(w_r); 
+  t_e = electromagnetic_torque_estimation_t_e   (psi_sD,i_sQ,psi_sQ,i_sD,pole_pairs);
 
 
   //flux_linkage_estimator_neglected_currents (2.0f*TICK_PERIOD,V_sD,V_sQ,&psi_sD_i_neglected,&psi_sQ_i_neglected);
-  flux_linkage_estimator_neglected_currents (2.0f*TICK_PERIOD,V_sD,V_sQ,&psi_sD_i_neglected,&psi_sQ_i_neglected);  
-  wr_i_neglected = 0.15915494309189533576f*rotor_speed_w_r (psi_sD_i_neglected,psi_sQ_i_neglected,TICK_PERIOD*2.0f);
-  w_r_neglected = wr_neglected_moving_average_filter(w_r_neglected); 
+  //flux_linkage_estimator_neglected_currents (2.0f*TICK_PERIOD,V_sD,V_sQ,&psi_sD_i_neglected,&psi_sQ_i_neglected);  
+  //wr_i_neglected = 0.15915494309189533576f*rotor_speed_w_r (psi_sD_i_neglected,psi_sQ_i_neglected,TICK_PERIOD*2.0f);
+  //wr_i_neglected = wr_neglected_moving_average_filter(wr_i_neglected); 
   //t_e       = electromagnetic_torque_estimation_t_e   (psi_sD,i_sQ,psi_sQ,i_sD,pole_pairs);
-  te_i_neglected = electromagnetic_torque_estimation_t_e   (psi_sD_i_neglected,i_sQ,psi_sQ_i_neglected,i_sD,pole_pairs);
+  //te_i_neglected = electromagnetic_torque_estimation_t_e   (psi_sD_i_neglected,i_sQ,psi_sQ_i_neglected,i_sD,pole_pairs);
+  
+
   //t_e =  te_moving_average_filter(t_e);
   psi_s_ref=psi_F;
 
