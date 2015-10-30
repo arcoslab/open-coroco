@@ -17,21 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
-/*void calc_attenuation(void) {
-  if (CUR_FREQ < START_ATTENUATION_FREQ) { //freq at which attenuation starts to increase
-    attenuation = MIN_ATTENUATION;
-  } else {
-    attenuation=MIN_ATTENUATION+(CUR_FREQ-START_ATTENUATION_FREQ)/(MAX_MOTOR_FREQ/(MAX_ATTENUATION-MIN_ATTENUATION)); //500 top freq of motor
-    if (attenuation > MAX_ATTENUATION ) {
-      attenuation = MAX_ATTENUATION;
-    }
-  }
-}
-*/
-
 int pi_mode=0;
 bool collected_permission=false;
 bool initial_rotor_position_start=false;
@@ -75,10 +60,8 @@ float ref_freq=0.0f;//1;
 
 float cur_angle=0.0f;
 float final_ref_freq=40;
-float error, p_error;
-float i_error=0;
+
 float cmd_angle;
-float pi_control;
 int close_loop=false;
 int first_closed=false;
 int motor_off=true;//false;
@@ -222,15 +205,15 @@ void calc_freq(void)
       }
      
       //update estimated current angle
-      //est_angle+=2.0f*PI*TICK_PERIOD/(period/TICK_PERIOD);
+      //est_angle+=2.0f*PI_CTE*TICK_PERIOD/(period/TICK_PERIOD);
 
       angle_hall1+=360.0f*TICK_PERIOD*CUR_FREQ;//***
       if (angle_hall1>=360.0f)
         { angle_hall1=0.0f; }
 
 
-      est_angle+=2.0f*PI/period;///TICK_PERIOD);
-      if (est_angle > 2.0f*PI) 
+      est_angle+=2.0f*PI_CTE/period;///TICK_PERIOD);
+      if (est_angle > 2.0f*PI_CTE) 
       {
 	est_angle=0.0f;
       }
@@ -241,76 +224,6 @@ void calc_freq(void)
 }
 
 
-/*
-void start_up(void) 
-{
-  if (CUR_FREQ < MIN_CLOSE_LOOP_FREQ) 
-  {
-    //printf("Open loop\n");
-    ref_freq=START_UP_REF_FREQ;
-    close_loop=false;
-    first_closed=true;
-  } 
-  else 
-  {
-    close_loop=true;
-  }
-
-  if (close_loop && first_closed) 
-  {
-    first_closed=false;
-    ref_freq=FIRST_CLOSE_LOOP_REF_FREQ;
-  }
-}
-*/
-/*  
-void pi_controller(void) {
-  error=ref_freq-CUR_FREQ; // ref_freq-cur_freq
-  if (error > 0.0f) {
-    p_error=P*error;
-  } else {
-    p_error=P_DOWN*error;
-  }
-  if (error > 0.0f) {
-    i_error+=I*error;
-  } else {
-    i_error+=I_DOWN*error;
-  }
-  if (i_error > I_MAX){
-    i_error=I_MAX;
-  }
-  if (i_error < -I_MAX) {
-    i_error=-I_MAX;
-  }
-  if (p_error > P_MAX) {
-    p_error=P_MAX;
-  }
-  if (p_error < -P_MAX) {
-    p_error= -P_MAX;
-  }
-  pi_control=p_error+i_error;
-  if (pi_control > PI_MAX) {
-    pi_control = PI_MAX;
-  }
-  if (pi_control < PI_MIN) {
-    pi_control = PI_MIN;
-  }
-  cmd_angle+=pi_control;
-  if (pi_control >= 0.0f) {
-    attenuation=MIN_ATTENUATION+pi_control/(PI_MAX/(MAX_ATTENUATION-MIN_ATTENUATION));
-  } else {
-    attenuation=MIN_ATTENUATION-pi_control/(PI_MAX/(MAX_ATTENUATION-MIN_ATTENUATION));
-  }
-}
-*/
-
-
-    char cmd_s[50]="";
-    char cmd[10]="";
-    float value=0.0f;//FIRST_CLOSE_LOOP_REF_FREQ;
-    int motor_stop=true;
-    int counter=0;
-    //motor_off=false;
 
 
 bool first_dtc=true;
@@ -319,46 +232,17 @@ bool dtc_on=true;
 void frequency_input(void)
 {
 
- 
+    char cmd_s[50]="";
+    char cmd[10]="";
+    float value=0.0f;
 
-     if (receive_a_string(cmd_s) )
-     {
-      printf("%s", cmd_s);
-      sscanf(cmd_s, "%s %f", cmd, &value);
-      
-      if (strcmp(cmd, "d") == 0)
-      {
-        
-        initial_rotor_position_start=true;
+    if (receive_a_string(cmd_s) )
+    {
+        printf("%s", cmd_s);
+        sscanf(cmd_s, "%s %f", cmd, &value);
 
-        collected_permission=true;
-
-        //print_selection=0;
-        regular_print=true;
-        dtc_on=true;
-        ref_freq_SVM=value;
-        motor_off=false;
-
-        if (ref_freq_SVM==0.0f) 
-        { 
-          dtc_on=true;
-        }
-        
-        collecting_speed=true;
-        //timer=0;
-
-        pi_mode=0;  //speed pi controller
-
-      }		
-
-      if (strcmp(cmd, "p") == 0)
-      {
-        
-        print_selection=value;
-        //timer=0;
-
-      }	
- 
+        if      (strcmp(cmd, "d") == 0)  {   ref_freq_SVM   =value; }		
+        else if (strcmp(cmd, "p") == 0)  {   print_selection=value; }	
     }
 
       

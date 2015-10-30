@@ -88,7 +88,7 @@ void  floating_switching_states (float* S_A, float* S_B, float* S_C)
 }
 
 //---------------------stator flux-linkage space vector estimation-------------------------------
-#define PI_CTE 3.14159265359f 
+ 
 #define F_CUTOFF 5.0f//5.0f
 #define W_CUTOFF (2.0f*PI_CTE*F_CUTOFF)
 #define CTE (150.0f)  
@@ -280,10 +280,10 @@ void voltage_switch_inverter_VSI(int S_A, int S_B, int S_C)
   float attenuation =1.0f;
   */
   close_loop=true;
-  cur_angle+=2.0f*PI*TICK_PERIOD*ref_freq;
+  cur_angle+=2.0f*PI_CTE*TICK_PERIOD*ref_freq;
   //converting big angles into something between 0 and 2pi
-  if (cur_angle >= (2.0f*PI)) {
-    cur_angle=cur_angle-(2.0f*PI);
+  if (cur_angle >= (2.0f*PI_CTE)) {
+    cur_angle=cur_angle-(2.0f*PI_CTE);
   }
 
 //close_loop=false;
@@ -291,8 +291,8 @@ void voltage_switch_inverter_VSI(int S_A, int S_B, int S_C)
   if (!close_loop) 
   {
     duty_a=sinf(cur_angle);
-    duty_b=sinf(cur_angle+2.0f*PI/3.0f);
-    duty_c=sinf(cur_angle+4.0f*PI/3.0f);
+    duty_b=sinf(cur_angle+2.0f*PI_CTE/3.0f);
+    duty_c=sinf(cur_angle+4.0f*PI_CTE/3.0f);
   } 
   else
   {
@@ -456,7 +456,7 @@ float C_inverse_clark_transformation(float V_sQ, float V_sD)
 float duty_cycle_to_angle(float duty_cycle)
 {
 	float angle;
-	angle=180.0f/PI*asinf(duty_cycle);
+	angle=180.0f/PI_CTE*asinf(duty_cycle);
 
 	if (angle>=360.0f)
 		angle=angle-360.0f;

@@ -13,6 +13,20 @@ tag_y='b'
 title=''
 
 
+rows = 1
+columns = 1 
+subplot_index = 1
+plot_figsize=(10, 5)
+plot_dpi=30
+plot_face_color='w'
+plot_edge_color='k'
+plotting_character     = ''
+
+
+
+
+
+
 def data_collection(data,data_buffer,collect,transmission_error):
     global state
     
@@ -85,6 +99,19 @@ def print_selection(print_selection):
     global tag_y
     global title    
 
+    global rows
+    global columns 
+    global subplot_index
+    global plot_figsize
+    global plot_dpi
+    global plot_face_color
+    global plot_edge_color
+    global plotting_character
+
+    height=7
+    lenght=7
+    
+
     if print_selection==0:
         tag_x="Cycles"
         tag_y="Frequency (Hz)"
@@ -93,10 +120,16 @@ def print_selection(print_selection):
         tag_x="isD (A)"
         tag_y="isQ (A)"
         title="Stator Current in polar reference"
+        plot_figsize=(height, lenght)
+        
+
     elif print_selection==2:
         tag_x="VsD (V)"
         tag_y="VsQ (V)"
         title="Stator voltage in polar reference"
+        plot_figsize=(height, lenght)
+         
+
     elif print_selection==3:
         tag_x="Cycles"
         tag_y="Battery Voltage (V)"
@@ -105,6 +138,9 @@ def print_selection(print_selection):
         tag_x="psi_sD (Wb)"
         tag_y="psi_sQ (Wb)"
         title="Flux-linkage"
+        plot_figsize=(height, lenght)
+         
+
     elif print_selection==5:
         tag_x="Cycles"
         tag_y="Electromagnetic torque (Nm)"
@@ -149,6 +185,9 @@ def print_selection(print_selection):
         tag_x="psi_sD (Wb)"
         tag_y="psi_sQ (Wb)"
         title="Flux-linkage with i neglected"
+        plot_figsize=(height, lenght)
+         
+
     elif print_selection==16:
         tag_x="Cycles"
         tag_y="Electromagnetic torque (Nm)"
@@ -169,18 +208,18 @@ def plot_data(data_buffer,path):
         global tag_y
         global tittle    
         
+        global rows
+        global columns 
+        global subplot_index
+        global plot_figsize
+        global plot_dpi
+        global plot_face_color
+        global plot_edge_color
+        global plotting_character
         
-        
-        rows = 1
-        columns = 1 
-        subplot_index = 1
-        plot_figsize=(10, 10)
-        plot_dpi=300
-        plot_face_color='w'
-        plot_edge_color='k'
-        plotting_character     = ''
         plot_name=path
 
+        
 
         if not os.path.exists(path):
             os.makedirs(path)
@@ -188,7 +227,7 @@ def plot_data(data_buffer,path):
         plt.figure(num=1, figsize=plot_figsize,dpi=plot_dpi, facecolor=plot_face_color, edgecolor=plot_edge_color) 
 
         plt.subplot(rows,columns,subplot_index)
-        plt.plot(data_buffer[0],data_buffer[1],plotting_character,label='electric')
+        plt.plot(data_buffer[0],data_buffer[1],plotting_character,label='')
         #plt.plot(x,x,plotting_character,label='hall'     ) 
         plt.title(title)
         plt.xlabel(tag_x)

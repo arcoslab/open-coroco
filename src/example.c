@@ -88,16 +88,8 @@ int main(void)
 
   while (1)
   {
-
-    if (transmitting_to_python==true)
-    {
-        //print_regular_data();
-        print_ascii_data();
-        transmitting_to_python=false;
-        collecting_sensorless_data=true; 
-    }
-
+    print_ascii_data();
     frequency_input();
-
   }
+
 }

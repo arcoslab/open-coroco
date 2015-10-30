@@ -26,63 +26,30 @@ float phase_advance_SVM=0.0f;
 float pi_max=0.0f;
 
 
-void sensorless_pure_speed_SVM_pi_controller(float reference_frequency, float frequency, float* rotating_angle) 
+
+
+void sensorless_pure_speed_SVM_pi_controller2(
+    float reference_frequency, 
+    float frequency, 
+    float P,
+    float I,
+    float PI_max,
+    float PI_min,
+    float* i_error,
+    float* pi)
+ 
 {
-  float        sensorless_error         = 0.0f;
-  float        p_sensorless_error       = 0.0f;
-  static float i_sensorless_error       = 0.0f;
-  float        pi_control_sensorless    = 0.0f;
+    float  error         = 0.0f;
+    float  p_error       = 0.0f;
 
-  sensorless_error=reference_frequency-frequency;
+    error     = reference_frequency-frequency;
+    p_error   = P*error;    
+    *i_error += I*error;    
+    *pi       = p_error+*i_error; 
 
-  if (sensorless_error > 0.0f) {  p_sensorless_error  = P_SENSORLESS_SVM      * sensorless_error;
-                                  i_sensorless_error += (I_SENSORLESS_SVM      * sensorless_error); } 
-  else                         {  p_sensorless_error  = P_DOWN_SENSORLESS_SVM * sensorless_error;
-                                  i_sensorless_error += (I_DOWN_SENSORLESS_SVM * sensorless_error); }
-
-  if      (i_sensorless_error >  I_MAX_SENSORLESS_SVM) { i_sensorless_error =  I_MAX_SENSORLESS_SVM; }
-  else if (i_sensorless_error < -I_MAX_SENSORLESS_SVM   ) { i_sensorless_error = -I_MAX_SENSORLESS_SVM; }
-
-  if      (p_sensorless_error >  P_MAX_SENSORLESS_SVM) { p_sensorless_error =  P_MAX_SENSORLESS_SVM; }
-  else if (p_sensorless_error < -P_MAX_SENSORLESS_SVM) { p_sensorless_error = -P_MAX_SENSORLESS_SVM; }
-
-
-  static float nan_counter=0;
-  if (i_sensorless_error!=i_sensorless_error)
-    {
-      i_sensorless_error=0.0f;
-      nan_counter+=1;
-    }
-    
-  pi_control_sensorless=p_sensorless_error+i_sensorless_error;
-
-  if      (pi_control_sensorless > PI_MAX_SENSORLESS_SVM) { pi_control_sensorless = PI_MAX_SENSORLESS_SVM; }
-  else if (pi_control_sensorless < PI_MIN_SENSORLESS_SVM) { pi_control_sensorless = PI_MIN_SENSORLESS_SVM; }
-
-
-  /*
-  if (reference_frequency!=0.0f)
-    *rotating_angle=pi_control_sensorless;
-  else 
-    *rotating_angle=0.0f;
-  */
-
-  *rotating_angle=pi_control_sensorless;
-
-  SVM_pi_control=*rotating_angle;           //pi_control_sensorless
-  phase_advance_SVM=pi_control_sensorless;  //*rotating_angle;//pi_control_sensorless;
-  pi_max=P_MAX_SENSORLESS_SVM;
+    if      (*pi > PI_max) { *pi = PI_max; }
+    else if (*pi < PI_min) { *pi = PI_min; }
 }
-
-
-
-float psi_advance_calculator(float reference_frequency, float interrupt_frequency)
-{
-  return 360.0f*reference_frequency/interrupt_frequency;
-}
-
-
-
 
 
 

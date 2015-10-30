@@ -26,7 +26,7 @@
 #define PRESCALE                                                   1 //freq_CK_CNT=freq_CK_PSC/(PSC[15:0]+1)
 #define PWM_PERIOD_ARR              SYSFREQ/( PWMFREQ*(PRESCALE+1) )
 #define INIT_DUTY                                               0.5f
-#define PI                                                   3.1416f
+#define PI_CTE 3.14159265359f
 #define TICK_PERIOD                                   (1.0f/PWMFREQ_F)
 #define MYUINT_MAX                                         536870912
 #define t ticks/TICK_PERIOD

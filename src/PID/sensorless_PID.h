@@ -17,23 +17,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-void sensorless_pure_speed_SVM_pi_controller        (float reference_frequency, float frequency, float* rotating_angle);
-void pure_speed_SVM_pi_controller_variable_frequency(float reference_frequency, float frequency, float* rotating_angle);
 
-void sensorless_speed_pi_controller(
-     float reference_frequency, float frequency,float* rotating_angle);
- 
-void sensorless_open_loop(
-     float *reference_frequency, float* sensorless_attenuation,float interrupt_frequency,float max_frequency,float frequency_increment);
+void sensorless_pure_speed_SVM_pi_controller(float reference_frequency, float frequency, float* rotating_angle) ;
 
-float psi_advance_calculator(float reference_frequency, float interrupt_frequency);
-
-void psi_finitite_state_machine (float reference_frequency, float real_frequency, float* rotating_angle);
-
-void sensorless_torque_pi_controller(
-                           float reference_torque, float torque, float* rotating_angle);
-
-//void sensorless_torque_pi_controller_from_speed(
-//                           float reference_torque, float torque,float switching_frequency, float* rotating_angle,float frequency,float *reference_frequency); 
+void sensorless_pure_speed_SVM_pi_controller2(
+    float reference_frequency, 
+    float frequency, 
+    float P,
+    float I,
+    float PI_max,
+    float PI_min,
+    float* i_error,
+    float* pi);
 
 

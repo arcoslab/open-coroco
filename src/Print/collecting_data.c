@@ -19,22 +19,12 @@ float data_y=0.0f;
 
 void collecting_floating_data(void)
 {
-  if (collecting_sensorless_data==true)
-  {
-    collecting_sensorless_data=false;
-    collecting_samples();
-    transmitting_to_python=true;
-  }
     timer=timer+1.0f;
     if (timer<0.0f)
         timer=0.0f;
     if (timer >=16777210.0f)
         timer =0.0f;
-}
 
-
-void collecting_samples(void)
-{       
     if      (print_selection==0)    {   data_x=timer          ;   data_y=hall_freq      ;   }
     else if (print_selection==1)    {   data_x=i_sD         ;   data_y=i_sQ             ;   }
     else if (print_selection==2)    {   data_x=V_sD         ;   data_y=V_sQ             ;   }
@@ -53,7 +43,11 @@ void collecting_samples(void)
     else if (print_selection==15)   {   data_x=psi_sD_NO_i  ;   data_y=psi_sQ_NO_i      ;   }
     else if (print_selection==16)   {   data_x=timer        ;   data_y=t_e_NO_i         ;   }
     else                            {   data_x=timer        ;   data_y=timer            ;   }
+
 }
+
+
+
 
 void print_ascii_data(void)
 {

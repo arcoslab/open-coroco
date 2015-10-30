@@ -32,22 +32,10 @@
 //PID parameters
 
 //voltage-frequency-based speed controller
-#define I_MAX_SENSORLESS_SVM            90.0f//  0.0005f//(90.0f*frequency/interrupt_frequency) 
-#define P_MAX_SENSORLESS_SVM            90.0f//  0.0005f//(90.0f*frequency/interrupt_frequency) 
-#define PI_MAX_SENSORLESS_SVM           90.0f//  0.0005f//(90.0f*frequency/interrupt_frequency) 
-#define PI_MIN_SENSORLESS_SVM          -90.0f// -0.0005f//-(90.0f*frequency/interrupt_frequency) 
-
-
-
-/************************************************************/
-////Activate when using the function: "SVM_speed_close_loop_of_voltage_frequency_old"////
-float P_SENSORLESS_SVM      = 0.00001f; 
-float P_DOWN_SENSORLESS_SVM = 0.00001f; 
-float I_SENSORLESS_SVM      = 0.0f;
-float I_DOWN_SENSORLESS_SVM = 0.0f;
-/****************************************************************/
-
-
+#define P_SVM   0.00002f//0.00001f
+#define I_SVM   0.0f
+#define PI_MAX   90.0f//  0.0005f//(90.0f*frequency/interrupt_frequency) 
+#define PI_MIN  -90.0f// -0.0005f//-(90.0f*frequency/interrupt_frequency) 
 
 
 //Admittance controller
