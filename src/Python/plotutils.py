@@ -172,7 +172,7 @@ def print_selection(print_selection):
     elif print_selection==12:
         tag_x="Cycles"
         tag_y="isC (A)"
-        title="Phase B current"
+        title="Phase C current"
     elif print_selection==13:
         tag_x="Cycles"
         tag_y="Frequency (Hz)"
