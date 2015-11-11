@@ -147,8 +147,8 @@ def print_selection(print_selection):
         title="Electromagnetic torque"
     elif print_selection==6:
         tag_x="Cycles"
-        tag_y="constant speed angle"
-        title="constant speed angle"
+        tag_y="PI control"
+        title="PI control"
     elif print_selection==7:
         tag_x="Cycles"
         tag_y="Strain gauge torque (Nm)"
@@ -186,14 +186,12 @@ def print_selection(print_selection):
         tag_y="psi_sQ (Wb)"
         title="Flux-linkage with i neglected"
         plot_figsize=(height, lenght)
+         
+
     elif print_selection==16:
         tag_x="Cycles"
         tag_y="Electromagnetic torque (Nm)"
         title="Electromagnetic torque with i neglected"
-    elif print_selection==17:
-        tag_x="Cycles"
-        tag_y="acceleration angle"
-        title="acceleration angle"
 
 def tag_x_():
     global tag_x

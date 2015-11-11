@@ -348,10 +348,6 @@ float t_e_NO_i=0.0f;
 float w_r_NO_i=0.0f;
 
 
-float w_r=0.0f;
-
-
-
 
 void shutdown_counter(float ref_frequency,bool* shutdown)
 {   
@@ -395,14 +391,14 @@ int   initial_rotor_zone=0;
 
 
 
-float constant_speed_angle=0.0f;
-float acceleration_angle=0.0f;
 
 
 
 float SVM_speed_close_loop_of_voltage_frequency(float reference_frequency, float frequency,float* VsD, float* VsQ,float Ud,bool shutdown)
 {
     static float cita=0.0f;
+    static float constant_speed_angle=0.0f;
+    static float acceleration_angle=0.0f;
 
     if (shutdown==true)
     {
@@ -414,35 +410,13 @@ float SVM_speed_close_loop_of_voltage_frequency(float reference_frequency, float
     else 
     {
         static float i_error=0.0f;  
-        
-        //sensorless_pure_speed_SVM_pi_controller2(reference_frequency,frequency,P_SVM,I_SVM,PI_MAX,PI_MIN,&i_error,&acceleration_angle);
-        
-        
-
-
-        //------------open-loop controller------------------
-        //constant_speed_angle=constant_speed_angle+0.0001f;
-
-        //---------semi close-loop controller-------------------------
-        /*if (reference_frequency<=150.0f)
-        {
-            sensorless_pure_speed_SVM_pi_controller2(reference_frequency,frequency,0.00002f,I_SVM,PI_MAX,PI_MIN,&i_error,&acceleration_angle);
+        sensorless_pure_speed_SVM_pi_controller2(reference_frequency,frequency,P_SVM,I_SVM,PI_MAX,PI_MIN,&i_error,&acceleration_angle);
+        //sensorless_pure_speed_SVM_pi_controller(reference_frequency, frequency, &acceleration_angle); 
+        SVM_pi_control=acceleration_angle;
+        //if (frequency < 100.0f)
             constant_speed_angle= constant_speed_angle+acceleration_angle;
-        }*/
-        //------------full close-loop controller---------------------- 
-        //else
-        //{
-            sensorless_pure_speed_SVM_pi_controller2(
-                reference_frequency,frequency,
-                P_SVM, I_SVM, PI_MAX, PI_MIN,
-                &i_error, &acceleration_angle   );
-         
-            constant_speed_angle=frequency*360.0f*(2.0f*TICK_PERIOD)+acceleration_angle;
-            //if (frequency<500.0f)
-            //constant_speed_angle=frequency*360.0f*(2.0f*TICK_PERIOD)+0.01f;
-            //constant_speed_angle=constant_speed_angle+0.0001f;
-        //}
- 
+                                //constant_speed_angle+0.0001f;//
+       //SVM_pi_control=constant_speed_angle;
         cita=cita+constant_speed_angle;
 
         if (cita>=360.0f) {cita=cita-360.0f;}
@@ -467,8 +441,7 @@ if (center_aligned_state==FIRST_HALF)
 
   //----------Frequency estimation with hall sensors--------------------
   hall_freq=frequency_direction_two_hall_sensors_AB(CUR_FREQ);
-  //hall_freq=CUR_FREQ;
-  //hall_freq=wr_moving_average_filter(hall_freq);
+
 
   //----------Current estimationn---------------------------------------
   i_sD     = direct_stator_current_i_sD     (i_sA);
@@ -494,7 +467,6 @@ if (center_aligned_state==FIRST_HALF)
 
 
   w_r = 0.15915494309189533576f*rotor_speed_w_r (psi_sD,psi_sQ,TICK_PERIOD*2.0f,previous_psi_sD,previous_psi_sQ);
-  if (w_r!=w_r) w_r=0.0f;
   //w_r = wr_moving_average_filter(w_r); 
   t_e = electromagnetic_torque_estimation_t_e   (psi_sD,i_sQ,psi_sQ,i_sD,pole_pairs);
 
@@ -506,15 +478,9 @@ if (center_aligned_state==FIRST_HALF)
   previous_psi_sD_NO_i=psi_sD_NO_i;
   previous_psi_sQ_NO_i=psi_sQ_NO_i;
   
-  if (previous_psi_sD_NO_i!=previous_psi_sD_NO_i) previous_psi_sD_NO_i=0.0f;
-  if (previous_psi_sQ_NO_i!=previous_psi_sQ_NO_i) previous_psi_sQ_NO_i=0.0f;
-  if (psi_sD_NO_i!=psi_sD_NO_i)                   psi_sD_NO_i=0.0f;
-  if (psi_sQ_NO_i!=psi_sQ_NO_i)                   psi_sQ_NO_i=0.0f ;
-
   psi_sD_NO_i=direct_stator_flux_linkage_estimator_psi_sD    (2.0f*TICK_PERIOD,V_sD,0.0f,R_s,psi_sD_NO_i);
   psi_sQ_NO_i=quadrature_stator_flux_linkage_estimator_psi_sQ(2.0f*TICK_PERIOD,V_sQ,0.0f,R_s,psi_sQ_NO_i);
   w_r_NO_i = 0.15915494309189533576f*rotor_speed_w_r (psi_sD_NO_i,psi_sQ_NO_i,TICK_PERIOD*2.0f,previous_psi_sD_NO_i,previous_psi_sQ_NO_i);
-  if (w_r_NO_i!=w_r_NO_i) w_r_NO_i=0.0f;
   //w_r = wr_moving_average_filter(w_r); 
   t_e_NO_i = electromagnetic_torque_estimation_t_e   (psi_sD_NO_i,i_sQ,psi_sQ_NO_i,i_sD,pole_pairs);
 
