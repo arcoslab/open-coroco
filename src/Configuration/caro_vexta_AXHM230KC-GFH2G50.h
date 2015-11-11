@@ -17,80 +17,25 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//vexta_AXHM230KC-GFH2G50_parameters
-//"Caro's motor"
+//vexta_AXHM450KC-GFH4G200_parameters
+
 
 //motor parameters
-
-//pending
-#define R_s_0          1.1111f    //Ohms
-#define L_s_d_0        0.0001f  //0.000038671875f  //H   0.000089f H
-#define L_s_q_0	       0.0001f  //0.00003515625f  //(54uH)H   0.000089f H
-#define psi_F_0        0.0067269f  //0.0016f//0.005f    //0.0016f  //Wb-t (weber-turn) (kg m2 s-2 A-1)
-//confirmed
-#define pole_pairs_0   5.0f	    //five pole pairs (five d-axis)
-#define gear_ratio     50.0f   //200:1
-
+#define R_s_0                   0.1111f    //Ohms
+#define L_s_d_0                 0.0001f  //0.000038671875f  //H   0.000089f H
+#define L_s_q_0	                0.0001f  //0.00003515625f  //(54uH)H   0.000089f H
+#define psi_F_0                 0.0067269f  //0.0016f//0.005f    //0.0016f  //Wb-t (weber-turn) (kg m2 s-2 A-1)
+#define pole_pairs_0            5.0f	    //five pole pairs (five d-axis)
+#define gear_ratio              50.0f//200.0f   //200:1
+#define DEAD_TIME               0.0f     //Dead time for switching from high to low transistors
 
 //PID parameters
 
 //voltage-frequency-based speed controller
-#define I_MAX_SENSORLESS_SVM            90.0f//  0.0005f//(90.0f*frequency/interrupt_frequency) 
-#define P_MAX_SENSORLESS_SVM            90.0f//  0.0005f//(90.0f*frequency/interrupt_frequency) 
-#define PI_MAX_SENSORLESS_SVM           90.0f//  0.0005f//(90.0f*frequency/interrupt_frequency) 
-#define PI_MIN_SENSORLESS_SVM          -90.0f// -0.0005f//-(90.0f*frequency/interrupt_frequency) 
-
-
-
-//fast
-//extra_voltage_angle=extra_voltage_angle+extra_load_angle;
-//[Original dirty speed controller]
-float P_SENSORLESS_SVM      = 0.00001f; 
-float P_DOWN_SENSORLESS_SVM = 0.00001f; 
-float fake_P_SENSORLESS_SVM = 0.000002f;
-float I_SENSORLESS_SVM      = 0.0f;
-float I_DOWN_SENSORLESS_SVM = 0.0f;
-float fake_I_SENSORLESS_SVM = 0.0f;
-
-
-//fast
-//extra_voltage_angle=extra_voltage_angle+extra_load_angle;
-//[corrected speed controller]
-float P_SENSORLESS_SVM_FREQUENCY   = 0.001; 
-float P_DOWN_SENSORLESS_SVM_FREQUENCY       = 0.001f; //too high: 0.0001; too slow 0.00001 ; max: 0.000012f
-float I_SENSORLESS_SVM_FREQUENCY            = 0.0f;
-float I_DOWN_SENSORLESS_SVM_FREQUENCY       = 0.0f;
-
-
-//DTC-SVM speed controller
-#define I_MAX_SENSORLESS            60.0f//  0.0005f//(90.0f*frequency/interrupt_frequency) 
-#define P_MAX_SENSORLESS            60.0f//  0.0005f//(90.0f*frequency/interrupt_frequency) 
-#define PI_MAX_SENSORLESS           60.0f//  0.0005f//(90.0f*frequency/interrupt_frequency) 
-#define PI_MIN_SENSORLESS          -60.0f// -0.0005f//-(90.0f*frequency/interrupt_frequency) 
-
-float P_SENSORLESS      = 0.8f; 
-float P_DOWN_SENSORLESS = 0.8f; 
-float fake_P_SENSORLESS = 0.8f;
-float I_SENSORLESS      = 0.0f;
-float I_DOWN_SENSORLESS = 0.0f;
-float fake_I_SENSORLESS = 0.0f;
-
-
-//DTC-SVM torque controller
-#define I_MAX_SENSORLESS_TORQUE            90.0f//  0.005f//(90.0f*frequency/interrupt_frequency) 
-#define P_MAX_SENSORLESS_TORQUE            90.0f//  0.005f//(90.0f*frequency/interrupt_frequency) 
-#define PI_MAX_SENSORLESS_TORQUE           90.0f//  0.005f//(90.0f*frequency/interrupt_frequency) 
-#define PI_MIN_SENSORLESS_TORQUE          -90.0f//  -0.005f//-(90.0f*frequency/interrupt_frequency) 
-
-float P_SENSORLESS_TORQUE      = 0.0f;
-float P_DOWN_SENSORLESS_TORQUE = 0.0f;
-float fake_P_SENSORLESS_TORQUE = 0.0f;
-float I_SENSORLESS_TORQUE      = 0.0f;
-float I_DOWN_SENSORLESS_TORQUE = 0.0f;
-float fake_I_SENSORLESS_TORQUE = 0.0f;
-
-
-#define FIXED_LOAD_ANGLE 80.0f
+#define P_SVM   0.00002f//0.00001f
+#define I_SVM   0.0f
+#define PI_MAX   90.0f//  0.0005f//(90.0f*frequency/interrupt_frequency) 
+#define PI_MIN  -90.0f// -0.0005f//-(90.0f*frequency/interrupt_frequency) 
 
 
 //Admittance controller
@@ -98,8 +43,8 @@ float fake_I_SENSORLESS_TORQUE = 0.0f;
 #define DAMPING   0.00001f
 #define MAX_SPEED 120.0f
 
-//Battey
-#define UD_PERCENTAGE   0.7f    //0.8f
+//Battery
+#define UD_PERCENTAGE   0.7f    //0.8f is the max value. More than that causes the battery to deliver an oscilating voltage instead of a dc voltaje. Furthermore, if you use 100% the current rises too much and the fuse melts.
 #define MAXIMUM_OPEN_LOOP_SPEED 100.0f
 #define MAXIMUM_OPEN_LOOP_ANGLE_INCREASE 0.0005f//0.0005f
 
