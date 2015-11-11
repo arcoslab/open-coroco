@@ -142,10 +142,14 @@ void calc_freq(void)
   static int  hall_a_last=0;
   static uint last_fall_hall_a_ticks=0;
   static int hall_bounce_counter=0;
-  //hall_a=HALL_A();
+  hall_a=HALL_A();
   //hall_b=HALL_B();
-  hall_a=HALL_B();
-  hall_b=HALL_A(); 
+
+  //hall_a=HALL_B();
+  //hall_a=wr_moving_average_filter(hall_a);
+
+  hall_b=HALL_B(); 
+  //hall_b=te_moving_average_filter(hall_b);
 
   if (first) 
   {

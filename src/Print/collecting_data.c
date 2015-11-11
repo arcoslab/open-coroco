@@ -31,7 +31,7 @@ void collecting_floating_data(void)
     else if (print_selection==3)    {   data_x=timer        ;   data_y=U_d              ;   }
     else if (print_selection==4)    {   data_x=psi_sD       ;   data_y=psi_sQ           ;   }
     else if (print_selection==5)    {   data_x=timer        ;   data_y=t_e              ;   }
-    else if (print_selection==6)    {   data_x=timer        ;   data_y=SVM_pi_control   ;   }
+    else if (print_selection==6)    {   data_x=timer        ;   data_y=constant_speed_angle   ;   }
     else if (print_selection==7)    {   data_x=timer        ;   data_y=strain_gauge     ;   }
     else if (print_selection==8)    {   data_x=stiffness    ;   data_y=damping          ;   }
     else if (print_selection==9)    {   data_x=timer        ;   data_y=electric_angle   ;   }
@@ -42,7 +42,8 @@ void collecting_floating_data(void)
     else if (print_selection==14)   {   data_x=timer        ;   data_y=w_r_NO_i         ;   }
     else if (print_selection==15)   {   data_x=psi_sD_NO_i  ;   data_y=psi_sQ_NO_i      ;   }
     else if (print_selection==16)   {   data_x=timer        ;   data_y=t_e_NO_i         ;   }
-    else                            {   data_x=timer        ;   data_y=timer            ;   }
+    else if (print_selection==17)   {   data_x=timer        ;   data_y=acceleration_angle         ;   }
+    else                            {   data_x=hall_freq        ;   data_y=hall_a            ;   }
 
 }
 
@@ -68,6 +69,7 @@ void print_ascii_data(void)
     else if (print_selection==14)   printf("%10.0f %3.3f \n",   data_x,data_y);
     else if (print_selection==15)   printf("%3.6f %3.6f \n",    data_x,data_y);
     else if (print_selection==16)   printf("%10.0f %3.3f \n",   data_x,data_y);
+    else if (print_selection==17)   printf("%10.0f %5.5f \n",   data_x,data_y);
     else                            printf("%10.0f %10.0f \n",  data_x,data_y);  
 }
 

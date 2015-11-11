@@ -18,13 +18,6 @@
  */
 
 
-float w_r=0.0f;
-
-float SVM_pi_control=0.0f;
-float psi_rotating_angle_SVM=0.0f;
-float phase_advance_SVM=0.0f;
-float pi_max=0.0f;
-
 
 
 
