@@ -116,18 +116,19 @@ def print_selection(print_selection):
         tag_x="Cycles"
         tag_y="Frequency (Hz)"
         title="Hall sensor speed"
-        
     elif print_selection==1:
         tag_x="isD (A)"
         tag_y="isQ (A)"
         title="Stator Current in polar reference"
         plot_figsize=(height, lenght)
+        
 
     elif print_selection==2:
         tag_x="VsD (V)"
         tag_y="VsQ (V)"
         title="Stator voltage in polar reference"
         plot_figsize=(height, lenght)
+         
 
     elif print_selection==3:
         tag_x="Cycles"

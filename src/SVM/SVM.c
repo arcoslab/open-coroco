@@ -467,10 +467,13 @@ if (center_aligned_state==FIRST_HALF)
 
   //----------Frequency estimation with hall sensors--------------------
   hall_freq=frequency_direction_two_hall_sensors_AB(CUR_FREQ);
+  //hall_freq=CUR_FREQ;
+  //hall_freq=wr_moving_average_filter(hall_freq);
 
   //----------Current estimationn---------------------------------------
   i_sD     = direct_stator_current_i_sD     (i_sA);
   i_sQ     = quadrature_stator_current_i_sQ (i_sA,i_sB);
+
 
   //--------------Flux-linkage estimation-------------------------------------------------------------------
 
@@ -492,6 +495,7 @@ if (center_aligned_state==FIRST_HALF)
 
   w_r = 0.15915494309189533576f*rotor_speed_w_r (psi_sD,psi_sQ,TICK_PERIOD*2.0f,previous_psi_sD,previous_psi_sQ);
   if (w_r!=w_r) w_r=0.0f;
+  //w_r = wr_moving_average_filter(w_r); 
   t_e = electromagnetic_torque_estimation_t_e   (psi_sD,i_sQ,psi_sQ,i_sD,pole_pairs);
 
   //--------------Flux-linkage estimation neglecting currents--------------------------------------------------
@@ -511,7 +515,7 @@ if (center_aligned_state==FIRST_HALF)
   psi_sQ_NO_i=quadrature_stator_flux_linkage_estimator_psi_sQ(2.0f*TICK_PERIOD,V_sQ,0.0f,R_s,psi_sQ_NO_i);
   w_r_NO_i = 0.15915494309189533576f*rotor_speed_w_r (psi_sD_NO_i,psi_sQ_NO_i,TICK_PERIOD*2.0f,previous_psi_sD_NO_i,previous_psi_sQ_NO_i);
   if (w_r_NO_i!=w_r_NO_i) w_r_NO_i=0.0f;
-
+  //w_r = wr_moving_average_filter(w_r); 
   t_e_NO_i = electromagnetic_torque_estimation_t_e   (psi_sD_NO_i,i_sQ,psi_sQ_NO_i,i_sD,pole_pairs);
 
   psi_s_ref=psi_F;
