@@ -25,7 +25,7 @@ void collecting_floating_data(void)
     if (timer >=16777210.0f)
         timer =0.0f;
 
-    if      (print_selection==0)    {   data_x=timer          ;   data_y=hall_freq      ;   }
+    if      (print_selection==0)    {   data_x=timer        ;   data_y=hall_freq        ;   }
     else if (print_selection==1)    {   data_x=i_sD         ;   data_y=i_sQ             ;   }
     else if (print_selection==2)    {   data_x=V_sD         ;   data_y=V_sQ             ;   }
     else if (print_selection==3)    {   data_x=timer        ;   data_y=U_d              ;   }
@@ -43,7 +43,10 @@ void collecting_floating_data(void)
     else if (print_selection==15)   {   data_x=psi_sD_NO_i  ;   data_y=psi_sQ_NO_i      ;   }
     else if (print_selection==16)   {   data_x=timer        ;   data_y=t_e_NO_i         ;   }
     else if (print_selection==17)   {   data_x=timer        ;   data_y=acceleration_angle         ;   }
-    else                            {   data_x=hall_freq        ;   data_y=hall_a            ;   }
+    else if (print_selection==18)   {   data_x=timer        ;   data_y=psi_s            ;   }
+    else if (print_selection==19)   {   data_x=timer        ;   data_y=V_s              ;   }    
+    else                            {   data_x=timer        ;   data_y=timer            ;   }
+    
 
 }
 
@@ -70,6 +73,8 @@ void print_ascii_data(void)
     else if (print_selection==15)   printf("%3.6f %3.6f \n",    data_x,data_y);
     else if (print_selection==16)   printf("%10.0f %3.3f \n",   data_x,data_y);
     else if (print_selection==17)   printf("%10.0f %5.5f \n",   data_x,data_y);
+    else if (print_selection==18)   printf("%10.0f %3.6f \n",    data_x,data_y);
+    else if (print_selection==19)   printf("%10.0f %3.2f \n",   data_x,data_y);
     else                            printf("%10.0f %10.0f \n",  data_x,data_y);  
 }
 

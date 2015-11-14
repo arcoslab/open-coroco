@@ -273,13 +273,7 @@ void  SVM_voltage_switch_inverter_VSI(float duty_A,float duty_B,float duty_C,boo
   timer_set_oc_value(TIM1, TIM_OC3, duty_C*Attenuation*PWM_PERIOD_ARR);
 }
 
-int S_A=0;
-int S_B=0;
-int S_C=0;
 
-float S_A_f=0;
-float S_B_f=0;
-float S_C_f=0;
 
 float i_sA = 0.0f;
 float i_sB = 0.0f;
@@ -307,20 +301,12 @@ float psi_sQ=0.0f;
 float psi_s =0.0f;
 int psi_alpha=0;
 float psi_s_alpha_SVM=0.0f;
-
-//float w_r=0;
+float psi_s_ref=0.0f;
+float w_r=0.0f;
 float t_e=0.0f;
 
-float psi_s_ref=0.0f;
-//float t_e_ref=10.0f;
-
-int   d_psi=0.0f;
-int   d_te=0.0f;
-float psi_delta_percentage=5.0f;
-float t_e_delta_percentage=25.0f;//0.8f;
 
 //SVM variables
-
 float T1=0.0f;
 float T2=0.0f;
 float T_min_on=0.0f;
@@ -336,19 +322,13 @@ float psi_F      = psi_F_0;
 
 
 //values calculated with i neglected
-/*
-float psi_sD_i_neglected=0.0f;
-float psi_sQ_i_neglected=0.0f;
-float te_i_neglected=0.0f;
-float wr_i_neglected=0.0f;
-*/
 float psi_sD_NO_i=0.0f;
 float psi_sQ_NO_i=0.0f;
 float t_e_NO_i=0.0f;
 float w_r_NO_i=0.0f;
 
 
-float w_r=0.0f;
+
 
 
 
@@ -421,35 +401,59 @@ float SVM_speed_close_loop_of_voltage_frequency(float reference_frequency, float
 
 
         //------------open-loop controller------------------
-        //constant_speed_angle=constant_speed_angle+0.0001f;
+        //constant_speed_angle=constant_speed_angle+0.00001f;
 
         //---------semi close-loop controller-------------------------
-        /*if (reference_frequency<=150.0f)
-        {
-            sensorless_pure_speed_SVM_pi_controller2(reference_frequency,frequency,0.00002f,I_SVM,PI_MAX,PI_MIN,&i_error,&acceleration_angle);
-            constant_speed_angle= constant_speed_angle+acceleration_angle;
-        }*/
+        //sensorless_pure_speed_SVM_pi_controller2(reference_frequency,frequency,0.00002f,0.0f,90.0f,-90.0f,&i_error,&acceleration_angle);
+        //constant_speed_angle= constant_speed_angle+acceleration_angle;
+
         //------------full close-loop controller---------------------- 
-        //else
+        //if (frequency<1.0f && frequency >-1.0f)
         //{
-            sensorless_pure_speed_SVM_pi_controller2(
+        sensorless_pure_speed_SVM_pi_controller2(
                 reference_frequency,frequency,
                 P_SVM, I_SVM, PI_MAX, PI_MIN,
                 &i_error, &acceleration_angle   );
-         
-            constant_speed_angle=frequency*360.0f*(2.0f*TICK_PERIOD)+acceleration_angle;
-            //if (frequency<500.0f)
-            //constant_speed_angle=frequency*360.0f*(2.0f*TICK_PERIOD)+0.01f;
-            //constant_speed_angle=constant_speed_angle+0.0001f;
-        //}
- 
+        
+        constant_speed_angle=frequency*360.0f*(2.0f*TICK_PERIOD)+acceleration_angle;
+        
         cita=cita+constant_speed_angle;
 
         if (cita>=360.0f) {cita=cita-360.0f;}
         if (cita<0.0f)    {cita=cita+360.0f;}
 
-       *VsD = 20.0f*Ud*fast_cos(cita);
-       *VsQ = 20.0f*Ud*fast_sine(cita);
+        *VsD = 20.0f*Ud*fast_cos(cita);
+        *VsQ = 20.0f*Ud*fast_sine(cita);
+        //}
+
+
+        //-----DTC-SVM method----------
+        /*else 
+        {
+        sensorless_pure_speed_SVM_pi_controller2(
+                reference_frequency,frequency,
+                P_SVM, I_SVM, PI_MAX, PI_MIN,
+                &i_error, &acceleration_angle   );
+        
+        constant_speed_angle=frequency*360.0f*(2.0f*TICK_PERIOD);
+
+        float load_angle=0.0f;
+        //load_angle= constant_speed_angle+acceleration_angle;
+        load_angle=45.0f;
+
+        cita=cita+constant_speed_angle+acceleration_angle;
+
+        if (cita<0.0f)    {cita=cita+360.0f;}
+
+
+        // *VsD = SVM_V_s_ref_D (psi_s_ref,psi_s,psi_s_alpha_SVM,psi_rotating_angle_SVM,i_sD,R_s,2.0f*TICK_PERIOD);
+        // *VsQ = SVM_V_s_ref_Q (psi_s_ref,psi_s,psi_s_alpha_SVM,psi_rotating_angle_SVM,i_sQ,R_s,2.0f*TICK_PERIOD);
+        // *VsD = SVM_V_s_ref_D (psi_s_ref,psi_s,psi_s_alpha_SVM,constant_speed_angle,i_sD,R_s,2.0f*TICK_PERIOD);
+        // *VsQ = SVM_V_s_ref_Q (psi_s_ref,psi_s,psi_s_alpha_SVM,constant_speed_angle,i_sQ,R_s,2.0f*TICK_PERIOD);
+        *VsD = SVM_V_s_ref_D (psi_s_ref,psi_s,cita,load_angle,i_sD,R_s,2.0f*TICK_PERIOD);
+        *VsQ = SVM_V_s_ref_Q (psi_s_ref,psi_s,cita,load_angle,i_sQ,R_s,2.0f*TICK_PERIOD);
+        }*/
+
    } 
 
    return constant_speed_angle;
@@ -485,7 +489,7 @@ if (center_aligned_state==FIRST_HALF)
 
   psi_sD=direct_stator_flux_linkage_estimator_psi_sD    (2.0f*TICK_PERIOD,V_sD,i_sD,R_s,psi_sD);
   psi_sQ=quadrature_stator_flux_linkage_estimator_psi_sQ(2.0f*TICK_PERIOD,V_sQ,i_sQ,R_s,psi_sQ);
-
+  fast_vector_angle_and_magnitude(psi_sQ,psi_sD,&psi_s,&psi_s_alpha_SVM);
 
   if (previous_psi_sD!=previous_psi_sD) previous_psi_sD=0.0f;
   if (previous_psi_sQ!=previous_psi_sQ) previous_psi_sQ=0.0f;
@@ -571,7 +575,7 @@ else
 
   SVM_Maximum_allowed_V_s_ref (&V_sD,&V_sQ,&V_s,U_d*UD_PERCENTAGE);//,&increase_flux);//0.70f);
   V_s_ref_relative_angle = SVM_V_s_relative_angle      (cita_V_s);
-
+  
 
   float V_s_duty_cycle=0.0f;
   float U_max=0.0f;

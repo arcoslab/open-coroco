@@ -128,7 +128,7 @@ def print_selection(print_selection):
         tag_y="VsQ (V)"
         title="Stator voltage in polar reference"
         plot_figsize=(height, lenght)
-         
+        plotting_character     = '.'
 
     elif print_selection==3:
         tag_x="Cycles"
@@ -139,7 +139,7 @@ def print_selection(print_selection):
         tag_y="psi_sQ (Wb)"
         title="Flux-linkage"
         plot_figsize=(height, lenght)
-         
+        plotting_character     = '.'
 
     elif print_selection==5:
         tag_x="Cycles"
@@ -192,6 +192,18 @@ def print_selection(print_selection):
         tag_x="Cycles"
         tag_y="Electromagnetic torque (Nm)"
         title="Electromagnetic torque with i neglected"
+    elif print_selection==17:
+        tag_x="Cycles"
+        tag_y="acceleration angle"
+        title="acceleration angle"
+    elif print_selection==18:
+        tag_x="Cycles"
+        tag_y="psi_s (Wb)"
+        title="Flux-linkage"
+    elif print_selection==19:
+        tag_x="Cycles"
+        tag_y="V_s (V)"
+        title="Stator Voltage Magnitude"
 
 def tag_x_():
     global tag_x
