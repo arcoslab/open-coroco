@@ -24,7 +24,7 @@ bool initial_rotor_position_start=false;
 
 float  psi_ref_user=0.0f;
 bool   user_input  =false;
-float  load_angle=0.0f;
+
 
 
 float timer=0.0f;
@@ -245,7 +245,9 @@ void frequency_input(void)
         printf("%s", cmd_s);
         sscanf(cmd_s, "%s %f", cmd, &value);
 
-        if      (strcmp(cmd, "d") == 0)  {   ref_freq_SVM   =value; }		
+        if      (strcmp(cmd, "d") == 0)  {   ref_freq_SVM   =value; }	
+        else if (strcmp(cmd, "a") == 0)  {   reference_electric_angle   =value*pole_pairs_0*gear_ratio*MAX_GEAR_CYCLES; }
+        else if (strcmp(cmd, "r") == 0)  {   reset_strain_gauge_reference   =true; }	
         else if (strcmp(cmd, "p") == 0)  {   print_selection=value; }	
     }
 

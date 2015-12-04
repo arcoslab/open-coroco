@@ -24,7 +24,7 @@ def main():
         stm32=Serial_Stm32()
         stm32.connecting_to_stm32F4()
         
-        while True:
+        while stm32.stop==False:
             
             try: 
                 stm32.write_commands_to_stm32()

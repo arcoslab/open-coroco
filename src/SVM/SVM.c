@@ -401,15 +401,46 @@ float SVM_speed_close_loop_of_voltage_frequency(float reference_frequency, float
 
 
         //------------open-loop controller------------------
-        //constant_speed_angle=constant_speed_angle+0.00001f;
+        /*
+        if ((frequency<100.0f) && (frequency >-100.0f))        
+            constant_speed_angle=constant_speed_angle+0.00001f;
+
+        cita=cita+constant_speed_angle;
+
+        if (cita>=360.0f) {cita=cita-360.0f;}
+        if (cita<0.0f)    {cita=cita+360.0f;}
+
+        *VsD = 20.0f*Ud*fast_cos(cita);
+        *VsQ = 20.0f*Ud*fast_sine(cita);
+        */
+
 
         //---------semi close-loop controller-------------------------
         //sensorless_pure_speed_SVM_pi_controller2(reference_frequency,frequency,0.00002f,0.0f,90.0f,-90.0f,&i_error,&acceleration_angle);
         //constant_speed_angle= constant_speed_angle+acceleration_angle;
 
         //------------full close-loop controller---------------------- 
-        //if (frequency<1.0f && frequency >-1.0f)
-        //{
+        
+        sensorless_pure_speed_SVM_pi_controller2(
+        reference_frequency,frequency,
+        P_SVM, I_SVM, PI_MAX, PI_MIN,
+        &i_error, &acceleration_angle   );
+        
+        constant_speed_angle=frequency*360.0f*(2.0f*TICK_PERIOD)+acceleration_angle;
+        
+        cita=cita+constant_speed_angle;
+
+        if (cita>=360.0f) {cita=cita-360.0f;}
+        if (cita<0.0f)    {cita=cita+360.0f;}
+
+        *VsD = 20.0f*Ud*fast_cos(cita);
+        *VsQ = 20.0f*Ud*fast_sine(cita);
+        
+
+
+        //-----DTC-SVM method----------
+/*        if (frequency<1.0f && frequency >-1.0f)
+        {
         sensorless_pure_speed_SVM_pi_controller2(
                 reference_frequency,frequency,
                 P_SVM, I_SVM, PI_MAX, PI_MIN,
@@ -424,27 +455,31 @@ float SVM_speed_close_loop_of_voltage_frequency(float reference_frequency, float
 
         *VsD = 20.0f*Ud*fast_cos(cita);
         *VsQ = 20.0f*Ud*fast_sine(cita);
-        //}
-
-
-        //-----DTC-SVM method----------
-        /*else 
+        }
+        else 
         {
         sensorless_pure_speed_SVM_pi_controller2(
                 reference_frequency,frequency,
-                P_SVM, I_SVM, PI_MAX, PI_MIN,
+                0.005f, 0.0f, 1.0f, -1.0f,
                 &i_error, &acceleration_angle   );
         
         constant_speed_angle=frequency*360.0f*(2.0f*TICK_PERIOD);
 
         float load_angle=0.0f;
         //load_angle= constant_speed_angle+acceleration_angle;
-        load_angle=45.0f;
 
-        cita=cita+constant_speed_angle+acceleration_angle;
 
+        //load_angle=90.0f;//45.0f;
+        //cita=cita+constant_speed_angle+acceleration_angle;
+
+
+        load_angle=90.0f+acceleration_angle;//45.0f;
+        cita=cita+constant_speed_angle;
+
+
+        if (cita>=360.0f) {cita=cita-360.0f;}
         if (cita<0.0f)    {cita=cita+360.0f;}
-
+        
 
         // *VsD = SVM_V_s_ref_D (psi_s_ref,psi_s,psi_s_alpha_SVM,psi_rotating_angle_SVM,i_sD,R_s,2.0f*TICK_PERIOD);
         // *VsQ = SVM_V_s_ref_Q (psi_s_ref,psi_s,psi_s_alpha_SVM,psi_rotating_angle_SVM,i_sQ,R_s,2.0f*TICK_PERIOD);
@@ -452,8 +487,8 @@ float SVM_speed_close_loop_of_voltage_frequency(float reference_frequency, float
         // *VsQ = SVM_V_s_ref_Q (psi_s_ref,psi_s,psi_s_alpha_SVM,constant_speed_angle,i_sQ,R_s,2.0f*TICK_PERIOD);
         *VsD = SVM_V_s_ref_D (psi_s_ref,psi_s,cita,load_angle,i_sD,R_s,2.0f*TICK_PERIOD);
         *VsQ = SVM_V_s_ref_Q (psi_s_ref,psi_s,cita,load_angle,i_sQ,R_s,2.0f*TICK_PERIOD);
-        }*/
-
+        }
+*/
    } 
 
    return constant_speed_angle;
@@ -529,18 +564,20 @@ if (center_aligned_state==FIRST_HALF)
 
 else
 {
+
   /**************************************************************/
   /*********Admitance Controller*********************************/
   /**************************************************************/
-  /*ref_freq_SVM = admittance_controller    (
+  ref_freq_SVM = admittance_controller    (
                                             stiffness,
                                             damping,
                                             reference_electric_angle,
                                             electric_angle,
                                             strain_gauge
                                             );
-  */
-
+  
+  shutdown_counter(reference_electric_angle,&shutdown);
+  //shutdown_counter(ref_freq_SVM,&shutdown);
 
 
   
@@ -548,7 +585,7 @@ else
                             /*SVM with PID controller on the frequency calculated with the hall sensor*/
                             SVM_speed_close_loop_of_voltage_frequency   (ref_freq_SVM,hall_freq,&V_sD,&V_sQ,U_d,shutdown); 
   
-  #define MAX_GEAR_CYCLES 100.0f
+  
 
   if (reference_electric_angle>=360.0f*pole_pairs*gear_ratio*MAX_GEAR_CYCLES)
     reference_electric_angle=reference_electric_angle-360.0f*pole_pairs*gear_ratio*MAX_GEAR_CYCLES;
@@ -593,7 +630,8 @@ else
   SVM_phase_duty_cycles           (&duty_a, &duty_b, &duty_c, cita_V_s,T_max_on,T_med_on,T_min_on);
   
 
-  shutdown_counter(ref_freq_SVM,&shutdown);
+
+
   SVM_voltage_switch_inverter_VSI ( duty_a,  duty_b,  duty_c,shutdown);
 }
 

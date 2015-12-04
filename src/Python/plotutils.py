@@ -20,7 +20,7 @@ plot_figsize=(10, 5)
 plot_dpi=30
 plot_face_color='w'
 plot_edge_color='k'
-plotting_character     = ''
+plotting_character     = '.'
 
 
 
@@ -128,7 +128,7 @@ def print_selection(print_selection):
         tag_y="VsQ (V)"
         title="Stator voltage in polar reference"
         plot_figsize=(height, lenght)
-        plotting_character     = '.'
+        #plotting_character     = '.'
 
     elif print_selection==3:
         tag_x="Cycles"
@@ -139,7 +139,7 @@ def print_selection(print_selection):
         tag_y="psi_sQ (Wb)"
         title="Flux-linkage"
         plot_figsize=(height, lenght)
-        plotting_character     = '.'
+        #plotting_character     = '.'
 
     elif print_selection==5:
         tag_x="Cycles"
@@ -204,6 +204,12 @@ def print_selection(print_selection):
         tag_x="Cycles"
         tag_y="V_s (V)"
         title="Stator Voltage Magnitude"
+    elif print_selection==20:
+        tag_x="reference electric frequency"
+        tag_y="reference_electric_angle"
+        title="reference"
+
+
 
 def tag_x_():
     global tag_x

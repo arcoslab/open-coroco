@@ -44,7 +44,8 @@ void collecting_floating_data(void)
     else if (print_selection==16)   {   data_x=timer        ;   data_y=t_e_NO_i         ;   }
     else if (print_selection==17)   {   data_x=timer        ;   data_y=acceleration_angle         ;   }
     else if (print_selection==18)   {   data_x=timer        ;   data_y=psi_s            ;   }
-    else if (print_selection==19)   {   data_x=timer        ;   data_y=V_s              ;   }    
+    else if (print_selection==19)   {   data_x=timer        ;   data_y=V_s              ;   }  
+    else if (print_selection==20)   {   data_x=ref_freq_SVM ;   data_y=reference_electric_angle;   }   
     else                            {   data_x=timer        ;   data_y=timer            ;   }
     
 

@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//vexta_AXHM450KC-GFH4G200_parameters
+//vexta_AXHM230KC-GFH4G50_parameters
 
 
 //-------------------------motor parameters-----------------------------------
@@ -28,18 +28,23 @@
 #define pole_pairs_0            5.0f	        //five pole pairs (five d-axis)
 #define gear_ratio              50.0f
 #define DEAD_TIME               0.0f            //Dead time for switching from high to low transistors
-
+#define MAX_GEAR_CYCLES 100.0f
 //-------------------------PID parameters-------------------------------------
-#define P_SVM   0.01f
-#define I_SVM   0.0000000005f
+
+/*
+#define P_SVM   0.005f
+#define I_SVM   0.0000000001f
 #define PI_MAX   1.0f
 #define PI_MIN  -1.0f
-
-
+*/
+#define P_SVM   0.005f
+#define I_SVM   0.0000000001f
+#define PI_MAX   1.0f
+#define PI_MIN  -1.0f
 //Admittance controller
-#define STIFFNESS 0.00001f
-#define DAMPING   0.00001f
-#define MAX_SPEED 120.0f
+#define STIFFNESS 0.0f//0.00001f
+#define DAMPING   0.000001f
+#define MAX_SPEED 300.0f
 
 
 //------------------Battery-----------------------------------
@@ -55,13 +60,29 @@
 
 //--------------------strain gauge---------------------------
 #define STRAIN_GAUGE_REFERENCE_VOLTAGE   0.0f//
-#define STRAIN_GAUGE_CONVERSION_FACTOR   2.0f//
+#define STRAIN_GAUGE_CONVERSION_FACTOR   0.273f//
 //strain gauge resistances
 //wheatstrone bridege: 343.3Ohm
 //gain voltage: Rg: 51.6Ohm=>G=4+60k/Rg=1166.79
+/*
+37g=>0.03V=>0.037/0.03=1.233
+148g=>0.10V=>0.148/0.10=1.48
+121g=>0.07V=>0.121/0.07=1.172
+366g=>0.23V=>0.366/0.23=1.59
 
+mg/V=1.4
 
+Torque  =d*F
+        =d*m*g
 
+d=19.5cm
+g=9.8m/s^2
+
+mg/V=
+
+=>T=V *mg*d/V
+=>T=V* 1.4*.195=V*0.273
+*/
 float strain_gauge_reference=STRAIN_GAUGE_REFERENCE_VOLTAGE;
 bool reset_strain_gauge_reference   =true;
 

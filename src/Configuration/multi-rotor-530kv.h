@@ -20,95 +20,70 @@
 //Multirotor_parameters
 
 
-//motor parameters
+//-------------------------motor parameters-----------------------------------
 #define R_s_0          0.225f   //Ohms
 #define L_s_d_0        0.0001f  //0.000038671875f  //H   0.000089f H
 #define L_s_q_0	       0.0001f  //0.00003515625f  //(54uH)H   0.000089f H
 #define psi_F_0        0.015f//0.0016f//0.005f    //0.0016f  //Wb-t (weber-turn) (kg m2 s-2 A-1)
 #define pole_pairs_0   7.0f	//seven pole pairs (seven d-axis)
 #define gear_ratio     1.0f   //1:1
+#define DEAD_TIME               0.0f            //Dead time for switching from high to low transistors
+#define MAX_GEAR_CYCLES 100.0f
 
+//-------------------------PID parameters-------------------------------------
 
-//PID parameters
-
-//voltage-frequency-based speed controller
-#define I_MAX_SENSORLESS_SVM            0.05f //90.0f//  0.0005f//(90.0f*frequency/interrupt_frequency) 
-#define P_MAX_SENSORLESS_SVM            0.05f //90.0f//  0.0005f//(90.0f*frequency/interrupt_frequency) 
-#define PI_MAX_SENSORLESS_SVM           0.05f //90.0f//  0.0005f//(90.0f*frequency/interrupt_frequency) 
-#define PI_MIN_SENSORLESS_SVM          -0.05f // -90.0f// -0.0005f//-(90.0f*frequency/interrupt_frequency) 
-
-
-
-//fast
-//extra_voltage_angle=extra_voltage_angle+extra_load_angle;
-//[Original dirty speed controller]
-float P_SENSORLESS_SVM      = 0.00001f; 
-float P_DOWN_SENSORLESS_SVM = 0.00001f; 
-float fake_P_SENSORLESS_SVM = 0.000002f;
-float I_SENSORLESS_SVM      = 0.0f;
-float I_DOWN_SENSORLESS_SVM = 0.0f;
-float fake_I_SENSORLESS_SVM = 0.0f;
-
-
-//fast
-//extra_voltage_angle=extra_voltage_angle+extra_load_angle;
-//[corrected speed controller]
-float P_SENSORLESS_SVM_FREQUENCY   = 0.001f; //0.01=> low speeds (up to 150Hz) 0.001=> high speeds (from 200Hz)
-float P_DOWN_SENSORLESS_SVM_FREQUENCY       = 0.001f;
-float I_SENSORLESS_SVM_FREQUENCY            = 0.00000f;//0.0000001f;
-float I_DOWN_SENSORLESS_SVM_FREQUENCY       = 0.00000f;//0.0000001f;
-//0.05 15
-//0.01 80
-//0.005 81
-//0.0025 ***
-
-//DTC-SVM speed controller
-#define I_MAX_SENSORLESS            60.0f//  0.0005f//(90.0f*frequency/interrupt_frequency) 
-#define P_MAX_SENSORLESS            60.0f//  0.0005f//(90.0f*frequency/interrupt_frequency) 
-#define PI_MAX_SENSORLESS           60.0f//  0.0005f//(90.0f*frequency/interrupt_frequency) 
-#define PI_MIN_SENSORLESS          -60.0f// -0.0005f//-(90.0f*frequency/interrupt_frequency) 
-
-float P_SENSORLESS      = 0.8f; 
-float P_DOWN_SENSORLESS = 0.8f; 
-float fake_P_SENSORLESS = 0.8f;
-float I_SENSORLESS      = 0.0f;
-float I_DOWN_SENSORLESS = 0.0f;
-float fake_I_SENSORLESS = 0.0f;
-
-
-//DTC-SVM torque controller
-#define I_MAX_SENSORLESS_TORQUE            90.0f//  0.005f//(90.0f*frequency/interrupt_frequency) 
-#define P_MAX_SENSORLESS_TORQUE            90.0f//  0.005f//(90.0f*frequency/interrupt_frequency) 
-#define PI_MAX_SENSORLESS_TORQUE           90.0f//  0.005f//(90.0f*frequency/interrupt_frequency) 
-#define PI_MIN_SENSORLESS_TORQUE          -90.0f//  -0.005f//-(90.0f*frequency/interrupt_frequency) 
-
-float P_SENSORLESS_TORQUE      = 0.0f;
-float P_DOWN_SENSORLESS_TORQUE = 0.0f;
-float fake_P_SENSORLESS_TORQUE = 0.0f;
-float I_SENSORLESS_TORQUE      = 0.0f;
-float I_DOWN_SENSORLESS_TORQUE = 0.0f;
-float fake_I_SENSORLESS_TORQUE = 0.0f;
-
-
-#define FIXED_LOAD_ANGLE 80.0f
-
-
+/*
+#define P_SVM   0.005f
+#define I_SVM   0.0000000001f
+#define PI_MAX   1.0f
+#define PI_MIN  -1.0f
+*/
+#define P_SVM   0.005f
+#define I_SVM   0.0000000001f
+#define PI_MAX   1.0f
+#define PI_MIN  -1.0f
 //Admittance controller
-#define STIFFNESS 0.00001f
-#define DAMPING   0.00001f
-#define MAX_SPEED 120.0f
+#define STIFFNESS 0.0f//0.00001f
+#define DAMPING   0.000001f
+#define MAX_SPEED 250.0f
 
-//Battey
-#define UD_PERCENTAGE   0.7f    //0.8f
-#define MAXIMUM_OPEN_LOOP_SPEED 100.0f
-#define MAXIMUM_OPEN_LOOP_ANGLE_INCREASE 0.0005f//0.0005f
+
+//------------------Battery-----------------------------------
+#define UD_PERCENTAGE   0.8f    //0.8f is the max value. 
+                                //More than that causes the battery to deliver an oscilating voltage instead of a dc voltaje. 
+                                //Furthermore, if you use 100% the current rises too much and the fuse melts.
+
+
 
 //Hall sensor parameters
 #define HALL_FACTOR 1.0f
 
-//strain gauge
-#define STRAIN_GAUGE_REFERENCE_VOLTAGE   0.0f//1.002f//1.02f
-#define STRAIN_GAUGE_CONVERSION_FACTOR   2.0f//1.303f
+
+//--------------------strain gauge---------------------------
+#define STRAIN_GAUGE_REFERENCE_VOLTAGE   0.0f//
+#define STRAIN_GAUGE_CONVERSION_FACTOR   0.273f//
+//strain gauge resistances
+//wheatstrone bridege: 343.3Ohm
+//gain voltage: Rg: 51.6Ohm=>G=4+60k/Rg=1166.79
+/*
+37g=>0.03V=>0.037/0.03=1.233
+148g=>0.10V=>0.148/0.10=1.48
+121g=>0.07V=>0.121/0.07=1.172
+366g=>0.23V=>0.366/0.23=1.59
+
+mg/V=1.4
+
+Torque  =d*F
+        =d*m*g
+
+d=19.5cm
+g=9.8m/s^2
+
+mg/V=
+
+=>T=V *mg*d/V
+=>T=V* 1.4*.195=V*0.273
+*/
 float strain_gauge_reference=STRAIN_GAUGE_REFERENCE_VOLTAGE;
 bool reset_strain_gauge_reference   =true;
 

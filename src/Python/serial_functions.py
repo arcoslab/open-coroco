@@ -35,6 +35,7 @@ class Serial_Stm32(object):
     plot=False
     test=False
     transmission_error=False
+    stop=False
 
     def __init__(self):
         print "initializing Serial_Stm32 class"    
@@ -256,7 +257,21 @@ class Serial_Stm32(object):
                     self.ser.write('\n')
                     self.ser.write('\r')                    
 
+                elif split_command[0]=='r': 
+                    self.ser.write('r')
+                    #self.ser.write(' ')
+                    #self.ser.write(split_command[1])
+                    self.ser.write('\n')
+                    self.ser.write('\r')  
 
+                elif split_command[0]=='a': 
+                    self.ser.write('a')
+                    self.ser.write(' ')
+                    self.ser.write(split_command[1])
+                    self.ser.write('\n')
+                    self.ser.write('\r') 
+                elif split_command[0]=='q': 
+                    self.stop=True
 
                 else: self.write_a_line(line)
 
