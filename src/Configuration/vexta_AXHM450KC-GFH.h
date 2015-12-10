@@ -37,6 +37,8 @@
 #define PI_MAX   1.0f
 #define PI_MIN  -1.0f
 */
+
+//working but oscillating
 #define P_SVM   0.005f
 #define I_SVM   0.0000000001f
 #define PI_MAX   1.0f

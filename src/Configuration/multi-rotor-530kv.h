@@ -38,18 +38,20 @@
 #define PI_MAX   1.0f
 #define PI_MIN  -1.0f
 */
+
+//working but oscillating
 #define P_SVM   0.005f
 #define I_SVM   0.0000000001f
 #define PI_MAX   1.0f
 #define PI_MIN  -1.0f
 //Admittance controller
-#define STIFFNESS 0.0f//0.00001f
-#define DAMPING   0.000001f
-#define MAX_SPEED 250.0f
+#define STIFFNESS 0.00005f//0.00001f
+#define DAMPING   0.00005f
+#define MAX_SPEED 200.0f
 
 
 //------------------Battery-----------------------------------
-#define UD_PERCENTAGE   0.8f    //0.8f is the max value. 
+#define UD_PERCENTAGE   0.7f    //0.8f is the max value. 
                                 //More than that causes the battery to deliver an oscilating voltage instead of a dc voltaje. 
                                 //Furthermore, if you use 100% the current rises too much and the fuse melts.
 
@@ -61,7 +63,7 @@
 
 //--------------------strain gauge---------------------------
 #define STRAIN_GAUGE_REFERENCE_VOLTAGE   0.0f//
-#define STRAIN_GAUGE_CONVERSION_FACTOR   0.273f//
+#define STRAIN_GAUGE_CONVERSION_FACTOR      9.0f//0.273f//
 //strain gauge resistances
 //wheatstrone bridege: 343.3Ohm
 //gain voltage: Rg: 51.6Ohm=>G=4+60k/Rg=1166.79
@@ -71,7 +73,7 @@
 121g=>0.07V=>0.121/0.07=1.172
 366g=>0.23V=>0.366/0.23=1.59
 
-mg/V=1.4
+mg/V=882/0.17=5.188
 
 Torque  =d*F
         =d*m*g
@@ -82,8 +84,20 @@ g=9.8m/s^2
 mg/V=
 
 =>T=V *mg*d/V
-=>T=V* 1.4*.195=V*0.273
+=>T=V* 0.803*9.8*.195/0.17    =V*9.02
 */
+
+
+
+
+/*
+0.803g
+0.17Vpp
+
+*/
+
+
+
 float strain_gauge_reference=STRAIN_GAUGE_REFERENCE_VOLTAGE;
 bool reset_strain_gauge_reference   =true;
 

@@ -568,6 +568,7 @@ else
   /**************************************************************/
   /*********Admitance Controller*********************************/
   /**************************************************************/
+  /*
   ref_freq_SVM = admittance_controller    (
                                             stiffness,
                                             damping,
@@ -577,7 +578,7 @@ else
                                             );
   
   shutdown_counter(reference_electric_angle,&shutdown);
-  //shutdown_counter(ref_freq_SVM,&shutdown);
+  */shutdown_counter(ref_freq_SVM,&shutdown);
 
 
   
