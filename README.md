@@ -1,8 +1,8 @@
 open-coroco
 ===========
 
-COmplaint RObot COntroller is a free software project aiming to create
-an impedance controller based on a stm32 microcontroller using bldc
+COmpliant RObot COntroller is a free software project aiming to create
+an impedance controller based on a STM32F4 microcontroller using bldc
 motors and strain gauges.
 
 # Installation
@@ -17,7 +17,7 @@ Please install the following requierments according to your distribution/OS inst
 libopencm3 is included as a git submodule
 
 ## Submodules
-Init and download de submodules:
+Init and download submodules:
 ```bash
 git submodule init
 git submodule update
@@ -47,10 +47,10 @@ We are looking into a better way to do this.
 
 ## Generate trigonometric functions tables
 Because of performance concerns we use tables to calculate
-trigonometric functions, to generate the tables there are some python
+trigonometric functions, to generate the tables there are some Python
 2 scripts in src/Trigonometric_Functions/. You must provide the number
 of elements on the table as a paremeter for this scripts and they
-generate some c header files, for example:
+generate some C header files, for example:
 
 ```bash
 python2 sine_table_generator.py 30
